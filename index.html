@@ -8,6 +8,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Meta tag untuk PWA/Instalasi -->
+    <meta name="theme-color" content="#050a10">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TNC7 Audio">
+
     <!-- LameJS untuk konversi MP3 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
     <!-- Tone.js untuk time-stretching & pitch-shifting independen -->
@@ -121,6 +127,12 @@
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 relative overflow-hidden min-w-[850px]" oncontextmenu="return false;">
+
+    <!-- Tombol Install PWA (Tersembunyi secara default, muncul jika bisa diinstal) -->
+    <button id="install-pwa-btn" class="hidden absolute top-4 right-4 z-50 bg-[#050a10] hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[10px] font-mono tracking-widest uppercase font-bold py-2 px-4 rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.1)] glowing-panel transition-all flex items-center space-x-2">
+        <i class="fas fa-desktop"></i>
+        <span>Install App</span>
+    </button>
 
     <!-- Main Card matching the screenshot's matte dark look -->
     <div class="bg-[#050a10] main-glowing-panel p-4 rounded-xl w-[800px] shrink-0 relative z-10">
@@ -1028,6 +1040,66 @@
         }
 
         setTimeout(resizeCanvas, 100);
+
+        // --- SCRIPT PWA & INSTALASI PC/MOBILE (Tidak mengganggu performa audio) ---
+        (function initPWA() {
+            let deferredPrompt;
+            const installBtn = document.getElementById('install-pwa-btn');
+
+            // 1. Generate Manifest dinamis untuk identitas Aplikasi
+            const manifestJSON = {
+                "name": "TNC7 Audio",
+                "short_name": "TNC7",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#03070c",
+                "theme_color": "#eab308",
+                "icons": [
+                    { "src": "https://placehold.co/192x192/eab308/000000?text=TNC7", "sizes": "192x192", "type": "image/png" },
+                    { "src": "https://placehold.co/512x512/eab308/000000?text=TNC7", "sizes": "512x512", "type": "image/png" }
+                ]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestJSON)], { type: 'application/manifest+json' });
+            const manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = URL.createObjectURL(manifestBlob);
+            document.head.appendChild(manifestLink);
+
+            // 2. Generate dummy Service Worker agar valid sebagai PWA di browser (Chrome/Edge)
+            const swCode = `
+                self.addEventListener('install', (e) => { self.skipWaiting(); });
+                self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });
+                self.addEventListener('fetch', (e) => { });
+            `;
+            const swBlob = new Blob([swCode], { type: 'application/javascript' });
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+            }
+
+            // 3. Tangkap event install dari browser
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault(); // Cegah prompt otomatis
+                deferredPrompt = e; // Simpan event
+                installBtn.classList.remove('hidden'); // Tampilkan tombol install kita
+            });
+
+            // 4. Aksi saat tombol Install ditekan
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        installBtn.classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                }
+            });
+
+            // Sembunyikan tombol jika sudah berhasil diinstal
+            window.addEventListener('appinstalled', () => {
+                installBtn.classList.add('hidden');
+            });
+        })();
 
     </script>
 </body>
