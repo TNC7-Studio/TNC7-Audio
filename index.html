@@ -128,15 +128,15 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 relative overflow-hidden min-w-[850px]" oncontextmenu="return false;">
 
-    <!-- Tombol Install PWA (Tersembunyi secara default, muncul jika bisa diinstal) -->
-    <button id="install-pwa-btn" class="hidden absolute top-4 right-4 z-50 bg-[#050a10] hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[10px] font-mono tracking-widest uppercase font-bold py-2 px-4 rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.1)] glowing-panel transition-all flex items-center space-x-2">
-        <i class="fas fa-desktop"></i>
-        <span>Install App</span>
-    </button>
-
     <!-- Main Card matching the screenshot's matte dark look -->
     <div class="bg-[#050a10] main-glowing-panel p-4 rounded-xl w-[800px] shrink-0 relative z-10">
         
+        <!-- Tombol Install PWA (Sekarang dibuat selalu tampil agar bisa dilihat posisinya) -->
+        <button id="install-pwa-btn" class="absolute top-4 right-4 z-50 bg-[#0a111a] hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[9px] font-mono tracking-widest uppercase font-bold py-1.5 px-3 rounded-md border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.1)] glowing-panel transition-all flex items-center space-x-1.5 cursor-pointer">
+            <i class="fas fa-desktop"></i>
+            <span>Install</span>
+        </button>
+
         <!-- Header -->
         <div class="text-center mb-3 flex flex-col items-center">
             <h1 class="text-4xl font-extrabold title-font mb-1 uppercase">
@@ -349,6 +349,7 @@
         let pitchShiftNode = null; 
         let progressInterval = null;
         let isDraggingSeek = false;
+        let capYPositionArray = []; // TAMBAHAN: Array untuk menyimpan posisi "topi" putih visualizer
 
         // Format seconds to MM:SS
         function formatTime(seconds) {
@@ -771,12 +772,14 @@
         function clearCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.beginPath();
-            ctx.moveTo(0, canvas.height / 2);
-            ctx.lineTo(canvas.width, canvas.height / 2);
-            ctx.strokeStyle = '#2a3441'; 
+            // Garis standby diubah ke bagian bawah (baseline)
+            ctx.moveTo(0, canvas.height - 1);
+            ctx.lineTo(canvas.width, canvas.height - 1);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'; 
             ctx.lineWidth = 2;
-            ctx.shadowBlur = 0;
             ctx.stroke();
+            
+            capYPositionArray = [];
         }
 
         function drawVisualizer() {
@@ -786,41 +789,63 @@
 
             const bufferLength = analyserNode.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
-            analyserNode.getByteTimeDomainData(dataArray);
+            
+            analyserNode.getByteFrequencyData(dataArray);
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = '#eab308';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#ca8a04';
+            const gap = 3;
+            const targetBarWidth = 10;
+            // Menghitung jumlah bar maksimum yang muat secara proporsional
+            const numBars = Math.floor((canvas.width + gap) / (targetBarWidth + gap));
+            
+            // KALKULASI PRESISI: Menyesuaikan lebar bar agar pas menutupi celah di sisi kanan
+            const barWidth = (canvas.width - ((numBars - 1) * gap)) / numBars;
+            
+            const step = Math.floor((bufferLength * 0.5) / numBars); 
 
-            ctx.beginPath();
-
-            const renderLength = bufferLength / 4; 
-            const sliceWidth = canvas.width * 1.0 / renderLength;
-            let x = 0;
-
-            for (let i = 0; i < renderLength; i++) {
-                const v = dataArray[i] / 128.0;
-                const y = v * canvas.height / 2;
-
-                if (i === 0) {
-                    ctx.moveTo(x, y);
-                } else {
-                    const prevX = x - sliceWidth;
-                    const prevV = (i > 0 ? dataArray[i-1] / 128.0 : v);
-                    const prevY = prevV * canvas.height / 2;
-                    const xc = (prevX + x) / 2;
-                    const yc = (prevY + y) / 2;
-                    ctx.quadraticCurveTo(prevX, prevY, xc, yc);
-                }
-                x += sliceWidth;
+            if (capYPositionArray.length !== numBars) {
+                capYPositionArray = new Array(numBars).fill(0);
             }
 
-            ctx.lineTo(canvas.width, canvas.height / 2);
-            ctx.stroke();
-            ctx.shadowBlur = 0; 
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            gradient.addColorStop(0, '#c700ff');   
+            gradient.addColorStop(0.3, '#ff00bb'); 
+            gradient.addColorStop(0.7, '#ff0000'); 
+            gradient.addColorStop(1, '#ff6600');   
+
+            for (let i = 0; i < numBars; i++) {
+                let sum = 0;
+                for (let j = 0; j < step; j++) {
+                    sum += dataArray[(i * step) + j];
+                }
+                let value = sum / step;
+                
+                const percent = value / 255;
+                const barHeight = percent * (canvas.height - 15);
+                
+                // Koordinat X sekarang akan presisi hingga ke piksel terakhir
+                const x = i * (barWidth + gap);
+                const y = canvas.height - barHeight;
+
+                if (barHeight > capYPositionArray[i]) {
+                    capYPositionArray[i] = barHeight;
+                } else {
+                    capYPositionArray[i] -= 1.5; 
+                    if (capYPositionArray[i] < 0) capYPositionArray[i] = 0;
+                }
+
+                ctx.fillStyle = gradient;
+                ctx.shadowBlur = 0; 
+                ctx.fillRect(x, y, barWidth, barHeight);
+
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = '#ffffff'; 
+                
+                const capY = canvas.height - capYPositionArray[i] - 3; 
+                ctx.fillRect(x, capY, barWidth, 3); 
+            }
         }
 
         function calculateBPM(buffer) {
@@ -1073,25 +1098,35 @@
             `;
             const swBlob = new Blob([swCode], { type: 'application/javascript' });
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+                // Tangkap error jika browser menolak blob SW karena alasan keamanan (seperti di editor ini)
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log("SW Register info:", err));
             }
 
             // 3. Tangkap event install dari browser
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault(); // Cegah prompt otomatis
-                deferredPrompt = e; // Simpan event
-                installBtn.classList.remove('hidden'); // Tampilkan tombol install kita
+                deferredPrompt = e; // Simpan event (berarti browser siap menginstal)
             });
 
             // 4. Aksi saat tombol Install ditekan
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
+                    // Jika siap, tampilkan prompt instalasi asli dari browser
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') {
-                        installBtn.classList.add('hidden');
+                        installBtn.classList.add('hidden'); // Sembunyikan setelah sukses diinstal
                     }
                     deferredPrompt = null;
+                } else {
+                    // Jika belum siap (karena belum di upload ke GitHub), tampilkan pesan
+                    const originalText = installBtn.innerHTML;
+                    installBtn.innerHTML = '<i class="fas fa-info-circle"></i><span class="text-[8px]">Upload ke GitHub dulu</span>';
+                    installBtn.classList.add('text-red-400', 'border-red-500/50');
+                    setTimeout(() => { 
+                        installBtn.innerHTML = originalText; 
+                        installBtn.classList.remove('text-red-400', 'border-red-500/50');
+                    }, 3000);
                 }
             });
 
