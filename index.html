@@ -128,8 +128,11 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 relative overflow-hidden min-w-[850px]" oncontextmenu="return false;">
 
+    <!-- Garis/Bar Kuning Neon di Ujung Paling Atas Layar -->
+    <div class="fixed top-0 left-0 w-full h-1.5 bg-gradient-to-r from-yellow-700 via-yellow-400 to-yellow-700 shadow-[0_0_20px_rgba(250,204,21,0.9)] z-[100]"></div>
+
     <!-- Main Card matching the screenshot's matte dark look -->
-    <div class="bg-[#050a10] main-glowing-panel p-4 rounded-xl w-[800px] shrink-0 relative z-10">
+    <div class="bg-[#050a10] main-glowing-panel p-4 rounded-xl w-[800px] shrink-0 relative z-10 mt-2">
         
         <!-- Tombol Install PWA (Sekarang dibuat selalu tampil agar bisa dilihat posisinya) -->
         <button id="install-pwa-btn" class="absolute top-4 right-4 z-50 bg-[#0a111a] hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[9px] font-mono tracking-widest uppercase font-bold py-1.5 px-3 rounded-md border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.1)] glowing-panel transition-all flex items-center space-x-1.5 cursor-pointer">
@@ -1078,7 +1081,7 @@
                 "start_url": window.location.pathname, 
                 "display": "standalone",
                 "background_color": "#03070c",
-                "theme_color": "#050a10",
+                "theme_color": "#ca8a04",
                 "icons": [
                     { "src": "https://placehold.co/192x192/eab308/000000?text=TNC7", "sizes": "192x192", "type": "image/png" },
                     { "src": "https://placehold.co/512x512/eab308/000000?text=TNC7", "sizes": "512x512", "type": "image/png" }
