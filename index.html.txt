@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TNC7 Audio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- LameJS untuk konversi MP3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+    <!-- Tone.js untuk time-stretching & pitch-shifting independen -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #03070c; /* Sangat gelap, hampir hitam murni */
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(5, 10, 15, 1) 0, transparent 50%), 
+                radial-gradient(at 100% 100%, rgba(2, 5, 8, 1) 0, transparent 50%);
+            color: #f8fafc;
+            /* Mencegah seleksi teks */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Menyembunyikan input range standar karena kita menggunakan tombol */
+        input[type=range] {
+            display: none;
+        }
+
+        .visualizer-container {
+            background-color: #050a10;
+            position: relative;
+            height: 90px; /* Dikembalikan ke ukuran yang cukup terlihat */
+            width: 100%;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            border: 1px dashed #eab308;
+            transition: all 0.3s ease;
+        }
+
+        .visualizer-container:hover {
+            border-color: #ca8a04;
+            background-color: rgba(234, 179, 8, 0.05); /* Sedikit glow saat hover */
+        }
+
+        .visualizer-container.dragover {
+            border-color: #facc15;
+            background-color: rgba(250, 204, 21, 0.1);
+            box-shadow: inset 0 0 20px rgba(250, 204, 21, 0.1);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #ca8a04 0%, #a16207 100%); /* Tema kuning */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(202, 138, 4, 0.2);
+        }
+        .btn-gradient:hover {
+            box-shadow: 0 6px 20px rgba(202, 138, 4, 0.4);
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+        }
+        .btn-gradient:active {
+            transform: scale(0.98);
+        }
+        
+        .pulse-text {
+            animation: pulse-soft 2s infinite;
+        }
+        
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Custom Scrollbar (jika konten memanjang) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #03070c; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #111827; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1f2937; 
+        }
+        
+        /* Font khusus untuk judul agar mirip gambar */
+        .title-font {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: 0.02em;
+        }
+
+        /* Class untuk efek glow tipis pada panel-panel dalam */
+        .glowing-panel {
+            border: 1px solid rgba(234, 179, 8, 0.2);
+            box-shadow: 0 0 12px rgba(234, 179, 8, 0.06), inset 0 0 5px rgba(234, 179, 8, 0.02);
+            transition: all 0.3s ease;
+        }
+        .glowing-panel:hover {
+            border-color: rgba(234, 179, 8, 0.35);
+            box-shadow: 0 0 18px rgba(234, 179, 8, 0.12), inset 0 0 8px rgba(234, 179, 8, 0.04);
+        }
+
+        /* Class khusus panel utama (menggabungkan bayangan gelap & glow terang) */
+        .main-glowing-panel {
+            border: 1px solid rgba(234, 179, 8, 0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 1), 0 0 20px rgba(234, 179, 8, 0.08), inset 0 0 8px rgba(234, 179, 8, 0.03);
+            transition: all 0.3s ease;
+        }
+        .main-glowing-panel:hover {
+            border-color: rgba(234, 179, 8, 0.4);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 1), 0 0 25px rgba(234, 179, 8, 0.15), inset 0 0 12px rgba(234, 179, 8, 0.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 relative overflow-hidden min-w-[850px]" oncontextmenu="return false;">
+
+    <!-- Main Card matching the screenshot's matte dark look -->
+    <div class="bg-[#050a10] main-glowing-panel p-4 rounded-xl w-[800px] shrink-0 relative z-10">
+        
+        <!-- Header -->
+        <div class="text-center mb-3 flex flex-col items-center">
+            <h1 class="text-4xl font-extrabold title-font mb-1 uppercase">
+                <span class="text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">TNC7</span> 
+                <span class="text-gray-100 drop-shadow-[0_0_15px_rgba(243,244,246,0.2)]">AUDIO</span>
+            </h1>
+            <div class="inline-block px-3 py-0.5 mt-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 text-[10px] font-semibold tracking-wider">
+                <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block mr-1.5 animate-pulse"></span>
+                SYSTEM READY
+            </div>
+        </div>
+
+        <!-- Visualizer Area (Click/Drop to upload) -->
+        <div id="drop-area" class="visualizer-container mb-3 cursor-pointer group flex items-center justify-center relative">
+            <input type="file" id="audio-file" accept="audio/mpeg, audio/mp3, audio/wav, audio/ogg" class="hidden">
+            
+            <canvas id="visualizer" class="absolute inset-0 w-full h-full z-10 pointer-events-none opacity-0 transition-opacity duration-300"></canvas>
+            
+            <!-- Upload Prompts -->
+            <div id="upload-prompt" class="text-center z-20 flex flex-col items-center">
+                <div class="w-10 h-10 rounded-lg bg-yellow-900/30 border border-yellow-500/40 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(234,179,8,0.2)]">
+                    <i class="fas fa-cloud-upload-alt text-lg text-yellow-400"></i>
+                </div>
+                <h3 class="text-white font-bold tracking-widest mb-0.5 text-sm">INITIALIZE UPLOAD</h3>
+                <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">
+                    DRAG & DROP AUDIO FILES
+                </p>
+                <div id="file-name-display" class="text-[10px] text-yellow-400 mt-1 font-mono font-semibold hidden truncate max-w-[250px] border border-yellow-500/30 bg-yellow-900/20 px-2 py-0.5 rounded"></div>
+            </div>
+
+            <!-- Loading State inside visualizer -->
+            <div id="loading-indicator" class="hidden z-20 flex flex-col items-center text-yellow-400">
+                <i class="fas fa-circle-notch fa-spin text-2xl mb-1"></i>
+                <span id="loading-text" class="text-[10px] font-mono tracking-widest uppercase font-semibold pulse-text">Memproses Audio...</span>
+            </div>
+        </div>
+
+        <div id="progress-container" class="bg-[#03070c] glowing-panel px-4 py-2 rounded-lg mb-3 flex flex-col gap-1">
+            <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 font-bold">
+                <span id="current-time">00:00</span>
+                <span id="track-status" class="text-yellow-500 tracking-wider uppercase">READY // NO TRACK LOADED</span>
+                <span id="total-duration">00:00</span>
+            </div>
+            <!-- Custom Clickable/Draggable Progress Track -->
+            <div id="seek-bar" class="w-full py-1.5 cursor-pointer group relative touch-none">
+                <div id="seek-track" class="w-full h-2 bg-[#111827] rounded-full relative">
+                    <div id="seek-progress" class="h-full bg-yellow-500 w-0 relative rounded-full pointer-events-none">
+                        <div id="seek-thumb" class="absolute -right-1.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-[0_0_8px_rgba(250,204,21,1)] scale-0 group-hover:scale-100 transition-transform duration-200"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="player-controls" class="space-y-3">
+            <!-- Row 1: Status Bar (Play, BPM, Detect) -->
+            <div class="bg-[#03070c] glowing-panel p-2 rounded-lg flex flex-row items-center justify-between gap-3">
+                
+                <!-- Play Button -->
+                <div class="flex items-center gap-3 w-auto">
+                    <button id="play-btn" class="btn-gradient w-[40px] h-[40px] rounded-lg text-white flex items-center justify-center focus:outline-none flex-shrink-0 group relative">
+                        <i class="fas fa-play text-lg ml-1" id="play-icon"></i>
+                    </button>
+                    
+                    <!-- BPM Display -->
+                    <div class="flex flex-col border-l border-[#1f2937] pl-3">
+                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold mb-0">Detected BPM</span>
+                        <div class="flex items-baseline space-x-1">
+                            <span id="bpm-display" class="text-xl font-bold font-mono text-white drop-shadow-sm">--</span>
+                            <span class="text-[9px] text-slate-500 font-mono tracking-widest uppercase">BPM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-row gap-2 w-auto">
+                    <button id="analyze-btn" class="w-auto shrink-0 h-8 px-4 rounded-md bg-transparent hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[10px] font-mono tracking-widest uppercase font-bold border border-yellow-900 hover:border-yellow-500 transition-all flex items-center justify-center space-x-1.5">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Detect</span>
+                    </button>
+                    <button id="download-btn" class="w-auto shrink-0 h-8 px-4 rounded-md bg-yellow-600 hover:bg-yellow-500 text-white text-[10px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center space-x-1.5 shadow-lg shadow-yellow-900/20">
+                        <i class="fas fa-download"></i>
+                        <span>Export</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                
+                <!-- Tempo Control -->
+                <div class="bg-[#03070c] glowing-panel p-3 rounded-lg flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-2 border-b border-yellow-500/20 pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-bold">PARAM //</span>
+                            <label class="text-[11px] font-bold text-yellow-400 font-mono tracking-wider">TEMPO</label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="reset-tempo" class="w-5 h-5 rounded bg-[#111827] hover:bg-yellow-900/50 flex items-center justify-center text-slate-500 hover:text-yellow-400 transition-colors" title="Reset Tempo">
+                                <i class="fas fa-undo text-[10px]"></i>
+                            </button>
+                            <span id="tempo-value" class="text-[11px] font-mono font-bold text-white bg-yellow-500/20 px-2 py-0.5 rounded min-w-[45px] text-center border border-yellow-500/30">1.00x</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Tempo Buttons -->
+                    <div class="flex flex-wrap gap-1.5 justify-center" id="tempo-buttons-container">
+                        <button class="tempo-btn active-tempo px-2 py-1 rounded-md text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all" data-val="1.0">1.0x</button>
+                        <button class="tempo-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="2.0">2.0x</button>
+                        <button class="tempo-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="3.0">3.0x</button>
+                        <button class="tempo-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="4.0">4.0x</button>
+                        <button class="tempo-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="5.0">5.0x</button>
+                    </div>
+                </div>
+
+                <!-- Pitch Control -->
+                <div class="bg-[#03070c] glowing-panel p-3 rounded-lg flex flex-col justify-center">
+                    <div class="flex justify-between items-center mb-2 border-b border-yellow-500/20 pb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] text-slate-500 font-mono tracking-widest uppercase font-bold">PARAM //</span>
+                            <label class="text-[11px] font-bold text-yellow-400 font-mono tracking-wider">PITCH</label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="reset-pitch" class="w-5 h-5 rounded bg-[#111827] hover:bg-yellow-900/50 flex items-center justify-center text-slate-500 hover:text-yellow-400 transition-colors shadow-sm" title="Reset Pitch">
+                                <i class="fas fa-undo text-[10px]"></i>
+                            </button>
+                            <span id="pitch-value" class="text-[11px] font-mono font-bold text-white bg-yellow-500/20 px-2 py-0.5 rounded min-w-[45px] text-center border border-yellow-500/30">0</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Pitch Buttons -->
+                    <div class="flex flex-wrap gap-1.5 justify-center" id="pitch-buttons-container">
+                        <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="-12">-12</button>
+                        <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="-6">-6</button>
+                        <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="-2">-2</button>
+                        <button class="pitch-btn active-pitch px-2 py-1 rounded-md text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all" data-val="0">0</button>
+                        <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="2">+2</button>
+                        <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="6">+6</button>
+                        <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="12">+12</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-[#03070c] glowing-panel p-2 rounded-lg flex flex-col justify-center">
+                <div class="flex flex-wrap gap-2 justify-center" id="mode-buttons-container">
+                    <button id="mode-pitch-lock" class="mode-btn active-mode flex-1 py-1.5 rounded-md text-[11px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-1.5">
+                        <i class="fas fa-lock"></i>
+                        <span>Normal (Kunci Nada)</span>
+                    </button>
+                    <button id="mode-chipmunk" class="mode-btn flex-1 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5">
+                        <i class="fas fa-meteor"></i>
+                        <span>Efek Tupai</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Script to disable some basic developer tools shortcuts (opsional tambahan perlindungan) -->
+    <script>
+        document.addEventListener('keydown', function(e) {
+            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            if(e.key === "F12" || 
+              (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) || 
+              (e.ctrlKey && e.key === "U")) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+
+    <script>
+        const fileInput = document.getElementById('audio-file');
+        const dropArea = document.getElementById('drop-area');
+        const uploadPrompt = document.getElementById('upload-prompt');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const playBtn = document.getElementById('play-btn');
+        const playIcon = document.getElementById('play-icon');
+        const tempoValueDisplay = document.getElementById('tempo-value');
+        const resetTempoBtn = document.getElementById('reset-tempo');
+        const pitchValueDisplay = document.getElementById('pitch-value');
+        const resetPitchBtn = document.getElementById('reset-pitch');
+        const bpmDisplay = document.getElementById('bpm-display');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const canvas = document.getElementById('visualizer');
+        const ctx = canvas.getContext('2d');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const loadingText = document.getElementById('loading-text');
+
+        // New DOM elements for progress and duration
+        const currentTimeEl = document.getElementById('current-time');
+        const totalDurationEl = document.getElementById('total-duration');
+        const trackStatusEl = document.getElementById('track-status');
+        const seekBar = document.getElementById('seek-bar');
+        const seekTrack = document.getElementById('seek-track');
+        const seekProgress = document.getElementById('seek-progress');
+
+        let audioContext;
+        let audioBuffer;
+        let sourceNode;
+        let analyserNode;
+        let isPlaying = false;
+        let startedAt = 0;
+        let pausedAt = 0;
+        let animationId;
+        let originalFileName = "TNC7_Audio";
+        let playbackTempo = 1.0; 
+        let playbackPitch = 0; 
+        let preservePitch = true; 
+        let pitchShiftNode = null; 
+        let progressInterval = null;
+        let isDraggingSeek = false;
+
+        // Format seconds to MM:SS
+        function formatTime(seconds) {
+            if (isNaN(seconds) || seconds < 0) return "00:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Trigger file input when clicking visualizer area
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and Drop Handling on visualizer area
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false);
+        });
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+
+        function handleFiles(files) {
+            if (files.length === 0) return;
+            const file = files[0];
+            
+            if (!file.type.startsWith('audio/')) {
+                const originalText = uploadPrompt.innerHTML;
+                uploadPrompt.innerHTML = '<span class="text-red-400">Hanya file MP3/WAV/OGG!</span>';
+                setTimeout(() => { uploadPrompt.innerHTML = originalText; }, 2000);
+                return;
+            }
+
+            originalFileName = file.name.replace(/\.[^/.]+$/, "");
+
+            let displayName = file.name;
+            if(displayName.length > 30) {
+                displayName = displayName.substring(0, 27) + '...';
+            }
+            
+            fileNameDisplay.innerHTML = `<i class="fas fa-file-audio mr-1"></i> ${displayName}`;
+            fileNameDisplay.classList.remove('hidden');
+            
+            uploadPrompt.querySelector('p').classList.add('hidden');
+            loadingIndicator.classList.remove('hidden');
+            canvas.style.opacity = '0';
+            loadingText.textContent = "Membaca file...";
+
+            stopAudio();
+            resetControls();
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                loadingText.textContent = "Mendekode...";
+                initAudio(e.target.result);
+            };
+            reader.onerror = function() {
+                loadingIndicator.classList.add('hidden');
+                uploadPrompt.querySelector('p').classList.remove('hidden');
+                alert("Terjadi kesalahan saat membaca file.");
+            }
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function initAudio(arrayBuffer) {
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    Tone.setContext(audioContext);
+                }
+
+                audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                
+                loadingIndicator.classList.add('hidden');
+                canvas.style.opacity = '1';
+                
+                resizeCanvas();
+                clearCanvas();
+                
+                // Update duration displays
+                const duration = audioBuffer.duration;
+                totalDurationEl.textContent = formatTime(duration);
+                currentTimeEl.textContent = "00:00";
+                seekProgress.style.width = "0%";
+                trackStatusEl.textContent = "READY // " + originalFileName.toUpperCase();
+
+                bpmDisplay.textContent = "...";
+                analyzeBtn.disabled = true;
+                setTimeout(() => {
+                    calculateBPM(audioBuffer);
+                }, 100); 
+
+            } catch (error) {
+                console.error("Error decoding:", error);
+                loadingIndicator.classList.add('hidden');
+                uploadPrompt.querySelector('p').classList.remove('hidden');
+                alert("Gagal mendekode file. Format mungkin tidak didukung.");
+            }
+        }
+
+        // Fungsi untuk menghitung persentase dan mengupdate UI & Audio
+        function getClientX(e) {
+            if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
+            if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
+            return e.clientX;
+        }
+
+        function updateSeekPosition(e) {
+            if (!audioBuffer) return;
+            const targetEl = seekTrack || seekBar;
+            const rect = targetEl.getBoundingClientRect();
+            let clickX = getClientX(e) - rect.left;
+            if (clickX < 0) clickX = 0;
+            if (clickX > rect.width) clickX = rect.width;
+            
+            const percentage = clickX / rect.width;
+            pausedAt = percentage * audioBuffer.duration;
+            currentTimeEl.textContent = formatTime(pausedAt);
+            seekProgress.style.width = (percentage * 100) + '%';
+        }
+
+        let wasPlayingBeforeDrag = false;
+
+        function handleDragStart(e) {
+            if (!audioBuffer) return;
+            isDraggingSeek = true;
+            wasPlayingBeforeDrag = isPlaying;
+            
+            if (isPlaying) {
+                isPlaying = false; // Mencegah onstop me-reset penuh posisi
+                if (sourceNode) {
+                    sourceNode.stop();
+                    sourceNode.dispose();
+                    sourceNode = null;
+                }
+                if (progressInterval) clearInterval(progressInterval);
+            }
+            
+            updateSeekPosition(e);
+        }
+
+        function handleDragMove(e) {
+            if (isDraggingSeek) {
+                if (e.cancelable) e.preventDefault(); 
+                updateSeekPosition(e);
+            }
+        }
+
+        function handleDragEnd(e) {
+            if (isDraggingSeek) {
+                isDraggingSeek = false;
+                updateSeekPosition(e);
+                
+                if (wasPlayingBeforeDrag) {
+                    playAudio(); // Mainkan kembali dari posisi baru
+                } else {
+                    currentTimeEl.textContent = formatTime(pausedAt);
+                    const percentage = pausedAt / audioBuffer.duration;
+                    seekProgress.style.width = (percentage * 100) + '%';
+                }
+            }
+        }
+
+        // Mouse Events
+        seekBar.addEventListener('mousedown', handleDragStart);
+        document.addEventListener('mousemove', handleDragMove);
+        document.addEventListener('mouseup', handleDragEnd);
+
+        // Touch Events untuk Mobile & Sentuhan Halus
+        seekBar.addEventListener('touchstart', handleDragStart, { passive: false });
+        document.addEventListener('touchmove', handleDragMove, { passive: false });
+        document.addEventListener('touchend', handleDragEnd);
+
+        function updateProgress() {
+            if (!isPlaying || !audioBuffer || isDraggingSeek) return;
+            const elapsedRealTime = (audioContext.currentTime - startedAt);
+            const currentAudioTime = Math.min(pausedAt + (elapsedRealTime * playbackTempo), audioBuffer.duration);
+            
+            const percentage = (currentAudioTime / audioBuffer.duration) * 100;
+            seekProgress.style.width = percentage + '%';
+            currentTimeEl.textContent = formatTime(currentAudioTime);
+
+            if (currentAudioTime >= audioBuffer.duration) {
+                stopAudio();
+            }
+        }
+
+        function playAudio() {
+            if (!audioBuffer) {
+                fileInput.click();
+                return;
+            }
+
+            if (Tone.context.state !== 'running') {
+                Tone.start();
+            }
+
+            if (!analyserNode) {
+                analyserNode = audioContext.createAnalyser();
+                analyserNode.fftSize = 2048; 
+                analyserNode.smoothingTimeConstant = 0.8;
+                analyserNode.connect(audioContext.destination);
+            }
+
+            if (!pitchShiftNode) {
+                pitchShiftNode = new Tone.PitchShift({
+                    windowSize: 0.1,
+                    pitch: 0
+                });
+                pitchShiftNode.connect(analyserNode);
+            }
+
+            sourceNode = new Tone.Player(audioBuffer);
+            sourceNode.playbackRate = playbackTempo;
+            
+            const tempoCompensation = preservePitch ? (-12 * Math.log2(playbackTempo)) : 0;
+            pitchShiftNode.pitch = playbackPitch + tempoCompensation;
+
+            sourceNode.connect(pitchShiftNode);
+
+            sourceNode.start(0, pausedAt);
+            startedAt = audioContext.currentTime; 
+            isPlaying = true;
+            
+            playIcon.classList.remove('fa-play', 'ml-1');
+            playIcon.classList.add('fa-pause');
+            trackStatusEl.textContent = "PLAYING // " + (preservePitch ? "PITCH LOCKED" : "CHIPMUNK MODE");
+            
+            sourceNode.onstop = () => {
+                if(isPlaying) {
+                    stopAudio();
+                }
+            };
+
+            if(progressInterval) clearInterval(progressInterval);
+            progressInterval = setInterval(updateProgress, 100);
+
+            drawVisualizer();
+        }
+
+        function stopAudio() {
+            if (sourceNode) {
+                sourceNode.stop();
+                sourceNode.dispose();
+                sourceNode = null;
+            }
+            isPlaying = false;
+            pausedAt = 0;
+            if(progressInterval) clearInterval(progressInterval);
+            playIcon.classList.remove('fa-pause');
+            playIcon.classList.add('fa-play', 'ml-1');
+            if(audioBuffer) {
+                currentTimeEl.textContent = "00:00";
+                seekProgress.style.width = "0%";
+                trackStatusEl.textContent = "READY // " + originalFileName.toUpperCase();
+            } else {
+                trackStatusEl.textContent = "READY // NO TRACK LOADED";
+            }
+            if(animationId) cancelAnimationFrame(animationId);
+            clearCanvas();
+        }
+
+        function pauseAudio() {
+            if (sourceNode) {
+                sourceNode.stop();
+                sourceNode.dispose();
+                sourceNode = null;
+            }
+            const effectiveElapsed = (audioContext.currentTime - startedAt) * playbackTempo;
+            pausedAt = Math.min(audioBuffer.duration, pausedAt + effectiveElapsed);
+            isPlaying = false;
+            if(progressInterval) clearInterval(progressInterval);
+            playIcon.classList.remove('fa-pause');
+            playIcon.classList.add('fa-play', 'ml-1');
+            trackStatusEl.textContent = "PAUSED";
+            if(animationId) cancelAnimationFrame(animationId);
+            clearCanvas();
+        }
+
+        playBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            if (isPlaying) {
+                pauseAudio();
+            } else {
+                playAudio();
+            }
+        });
+
+        function setTempo(val) {
+            if (isPlaying) {
+                // Kalkulasi ulang posisi jika tempo diganti secara live agar tidak loncat
+                const effectiveElapsed = (audioContext.currentTime - startedAt) * playbackTempo;
+                pausedAt = Math.min(audioBuffer.duration, pausedAt + effectiveElapsed);
+                startedAt = audioContext.currentTime;
+            }
+
+            playbackTempo = val;
+            tempoValueDisplay.textContent = val.toFixed(2) + 'x';
+            
+            document.querySelectorAll('.tempo-btn').forEach(btn => {
+                if (parseFloat(btn.getAttribute('data-val')) === val) {
+                    btn.className = "tempo-btn active-tempo px-2 py-1 rounded-lg text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all";
+                } else {
+                    btn.className = "tempo-btn px-2 py-1 rounded-lg text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all";
+                }
+            });
+
+            if (sourceNode && pitchShiftNode) {
+                sourceNode.playbackRate = val;
+                const tempoCompensation = preservePitch ? (-12 * Math.log2(val)) : 0;
+                pitchShiftNode.pitch = playbackPitch + tempoCompensation;
+            }
+        }
+
+        document.querySelectorAll('.tempo-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const val = parseFloat(e.currentTarget.getAttribute('data-val'));
+                setTempo(val);
+            });
+        });
+
+        resetTempoBtn.addEventListener('click', () => {
+            setTempo(1.0);
+        });
+
+        function setPitch(val) {
+            playbackPitch = val;
+            pitchValueDisplay.textContent = val + ' Semi';
+            
+            document.querySelectorAll('.pitch-btn').forEach(btn => {
+                if (parseFloat(btn.getAttribute('data-val')) === val) {
+                    btn.className = "pitch-btn active-pitch px-2 py-1 rounded-lg text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all";
+                } else {
+                    btn.className = "pitch-btn px-2 py-1 rounded-lg text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all";
+                }
+            });
+
+            if (sourceNode && pitchShiftNode) {
+                const tempoCompensation = preservePitch ? (-12 * Math.log2(playbackTempo)) : 0;
+                pitchShiftNode.pitch = val + tempoCompensation;
+            }
+        }
+
+        document.querySelectorAll('.pitch-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const val = parseFloat(e.currentTarget.getAttribute('data-val'));
+                setPitch(val);
+            });
+        });
+
+        resetPitchBtn.addEventListener('click', () => {
+            setPitch(0);
+        });
+
+        const modePitchLock = document.getElementById('mode-pitch-lock');
+        const modeChipmunk = document.getElementById('mode-chipmunk');
+
+        modePitchLock.addEventListener('click', () => {
+            preservePitch = true;
+            modePitchLock.className = "mode-btn active-mode flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-2";
+            modeChipmunk.className = "mode-btn flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-2";
+            
+            if (sourceNode && pitchShiftNode) {
+                const tempoCompensation = -12 * Math.log2(playbackTempo);
+                pitchShiftNode.pitch = playbackPitch + tempoCompensation;
+            }
+        });
+
+        modeChipmunk.addEventListener('click', () => {
+            preservePitch = false;
+            modeChipmunk.className = "mode-btn active-mode flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-2";
+            modePitchLock.className = "mode-btn flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-2";
+            
+            if (sourceNode && pitchShiftNode) {
+                pitchShiftNode.pitch = playbackPitch;
+            }
+        });
+
+        function resetControls() {
+            setTempo(1.0);
+            setPitch(0);
+            bpmDisplay.textContent = '--';
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            if(!isPlaying) clearCanvas();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.strokeStyle = '#2a3441'; 
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 0;
+            ctx.stroke();
+        }
+
+        function drawVisualizer() {
+            if (!isPlaying) return;
+
+            animationId = requestAnimationFrame(drawVisualizer);
+
+            const bufferLength = analyserNode.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyserNode.getByteTimeDomainData(dataArray);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#eab308';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ca8a04';
+
+            ctx.beginPath();
+
+            const renderLength = bufferLength / 4; 
+            const sliceWidth = canvas.width * 1.0 / renderLength;
+            let x = 0;
+
+            for (let i = 0; i < renderLength; i++) {
+                const v = dataArray[i] / 128.0;
+                const y = v * canvas.height / 2;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    const prevX = x - sliceWidth;
+                    const prevV = (i > 0 ? dataArray[i-1] / 128.0 : v);
+                    const prevY = prevV * canvas.height / 2;
+                    const xc = (prevX + x) / 2;
+                    const yc = (prevY + y) / 2;
+                    ctx.quadraticCurveTo(prevX, prevY, xc, yc);
+                }
+                x += sliceWidth;
+            }
+
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0; 
+        }
+
+        function calculateBPM(buffer) {
+            if(!buffer) return;
+            
+            let offlineContext = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, buffer.length, buffer.sampleRate);
+            let source = offlineContext.createBufferSource();
+            source.buffer = buffer;
+
+            let lowpass = offlineContext.createBiquadFilter();
+            lowpass.type = "lowpass";
+            lowpass.frequency.value = 150;
+
+            let highpass = offlineContext.createBiquadFilter();
+            highpass.type = "highpass";
+            highpass.frequency.value = 40;
+
+            source.connect(lowpass);
+            lowpass.connect(highpass);
+            highpass.connect(offlineContext.destination);
+            source.start(0);
+
+            offlineContext.startRendering().then(function(renderedBuffer) {
+                let data = renderedBuffer.getChannelData(0);
+                let peaks = getPeaks(data, renderedBuffer.sampleRate);
+                let groups = getIntervals(peaks, renderedBuffer.sampleRate);
+
+                if (groups.length > 0) {
+                    let top = groups.sort((a, b) => b.count - a.count)[0];
+                    let bpm = Math.round(top.tempo);
+                    bpmDisplay.textContent = bpm;
+                } else {
+                    bpmDisplay.textContent = "--";
+                }
+                analyzeBtn.disabled = false;
+            }).catch(function(err) {
+                console.error("BPM calculation error:", err);
+                bpmDisplay.textContent = "ERR";
+                analyzeBtn.disabled = false;
+            });
+        }
+
+        function getPeaks(data, sampleRate) {
+            let partSize = Math.floor(sampleRate / 2);
+            let parts = Math.floor(data.length / partSize);
+            let peaks = [];
+
+            for (let i = 0; i < parts; i++) {
+                let max = 0;
+                let maxIndex = -1;
+                for (let j = i * partSize; j < (i + 1) * partSize; j++) {
+                    let volume = Math.abs(data[j]);
+                    if (volume > max) {
+                        max = volume;
+                        maxIndex = j;
+                    }
+                }
+                if (maxIndex !== -1) {
+                    peaks.push({ position: maxIndex, volume: max });
+                }
+            }
+            
+            peaks.sort((a, b) => b.volume - a.volume);
+            peaks = peaks.splice(0, Math.floor(peaks.length * 0.5));
+            peaks.sort((a, b) => a.position - b.position);
+            
+            return peaks;
+        }
+
+        function getIntervals(peaks, sampleRate) {
+            let groups = [];
+            for (let index = 0; index < peaks.length; index++) {
+                for (let i = 1; (i < 10) && (index + i < peaks.length); i++) {
+                    let peak = peaks[index];
+                    let nextPeak = peaks[index + i];
+                    let interval = (nextPeak.position - peak.position) / sampleRate;
+                    let tempo = (60 / interval);
+
+                    while (tempo < 70) tempo *= 2;
+                    while (tempo > 180) tempo /= 2;
+
+                    tempo = Math.round(tempo);
+
+                    let group = groups.find((g) => g.tempo === tempo);
+                    if (group) {
+                        group.count++;
+                    } else {
+                        groups.push({ tempo: tempo, count: 1 });
+                    }
+                }
+            }
+            return groups;
+        }
+
+        analyzeBtn.addEventListener('click', () => {
+            if(!audioBuffer) {
+                alert("Silakan muat file audio terlebih dahulu!");
+                return;
+            }
+            bpmDisplay.textContent = "...";
+            analyzeBtn.disabled = true;
+            setTimeout(() => {
+                calculateBPM(audioBuffer);
+            }, 100);
+        });
+
+        downloadBtn.addEventListener('click', async () => {
+            if (!audioBuffer) {
+                alert("Silakan muat file audio terlebih dahulu!");
+                return;
+            }
+
+            downloadBtn.disabled = true;
+            const oldHtml = downloadBtn.innerHTML;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Memproses...</span>';
+
+            const currentTempo = playbackTempo;
+            const currentPitch = playbackPitch;
+            const newDuration = audioBuffer.duration / currentTempo;
+            const isChipmunk = !preservePitch;
+
+            try {
+                const renderedBuffer = await Tone.Offline(({ context }) => {
+                    const renderSource = new Tone.Player(audioBuffer);
+                    renderSource.playbackRate = currentTempo;
+
+                    const tempoCompensation = isChipmunk ? 0 : (-12 * Math.log2(currentTempo));
+                    const exportPitchShift = new Tone.PitchShift({
+                        pitch: currentPitch + tempoCompensation,
+                        windowSize: 0.1
+                    }).toDestination();
+
+                    renderSource.connect(exportPitchShift);
+                    renderSource.start(0);
+                }, newDuration);
+                
+                const blob = encodeAudioBufferToMp3(renderedBuffer);
+                const defaultName = `${originalFileName}_${currentTempo.toFixed(2)}x_TNC7_Audio.mp3`;
+
+                const isIframe = window.self !== window.top;
+
+                if (window.showSaveFilePicker && !isIframe) {
+                    try {
+                        const handle = await window.showSaveFilePicker({
+                            suggestedName: defaultName,
+                            types: [{
+                                description: 'MP3 Audio File',
+                                accept: {'audio/mpeg': ['.mp3']},
+                            }],
+                        });
+                        const writable = await handle.createWritable();
+                        await writable.write(blob);
+                        await writable.close();
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            fallbackDownload(blob, defaultName);
+                        }
+                    }
+                } else {
+                    fallbackDownload(blob, defaultName);
+                }
+            } catch (error) {
+                console.error("Export error:", error);
+                alert("Terjadi kesalahan saat mengekspor audio.");
+            } finally {
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = oldHtml;
+            }
+        });
+
+        function fallbackDownload(blob, filename) {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function encodeAudioBufferToMp3(buffer) {
+            const channels = buffer.numberOfChannels;
+            const sampleRate = buffer.sampleRate;
+            const kbps = 192;
+            const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, kbps);
+            const mp3Data = [];
+
+            const samples = buffer.length;
+            const left = buffer.getChannelData(0);
+            const right = channels > 1 ? buffer.getChannelData(1) : left;
+
+            const sampleBlockSize = 1152;
+            const leftInt16 = new Int16Array(samples);
+            const rightInt16 = new Int16Array(samples);
+            for (let i = 0; i < samples; i++) {
+                leftInt16[i] = Math.max(-1, Math.min(1, left[i])) * 32767;
+                rightInt16[i] = Math.max(-1, Math.min(1, right[i])) * 32767;
+            }
+
+            for (let i = 0; i < samples; i += sampleBlockSize) {
+                const leftChunk = leftInt16.subarray(i, i + sampleBlockSize);
+                const rightChunk = rightInt16.subarray(i, i + sampleBlockSize);
+                
+                const mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+                if (mp3buf.length > 0) {
+                    mp3Data.push(mp3buf);
+                }
+            }
+            
+            const mp3buf = mp3encoder.flush();
+            if (mp3buf.length > 0) {
+                mp3Data.push(mp3buf);
+            }
+            
+            return new Blob(mp3Data, { type: 'audio/mpeg' });
+        }
+
+        setTimeout(resizeCanvas, 100);
+
+    </script>
+</body>
+</html>
