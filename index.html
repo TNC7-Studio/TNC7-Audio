@@ -1071,8 +1071,7 @@
             let deferredPrompt;
             const installBtn = document.getElementById('install-pwa-btn');
 
-            // 1. Generate Manifest dinamis menggunakan Data URI (Lebih stabil di GitHub Pages)
-            // Menggunakan window.location.pathname agar otomatis mendeteksi sub-direktori (TNC7-Audio)
+            // 1. Generate Manifest dinamis
             const manifestJSON = {
                 "name": "TNC7 Audio",
                 "short_name": "TNC7",
@@ -1086,7 +1085,6 @@
                 ]
             };
             
-            // Konversi manifest ke Data URL agar Chrome tidak menganggapnya sebagai ancaman keamanan (Blob block)
             const manifestString = JSON.stringify(manifestJSON);
             const manifestDataUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(manifestString);
             
@@ -1095,7 +1093,7 @@
             manifestLink.href = manifestDataUrl;
             document.head.appendChild(manifestLink);
 
-            // 2. Dummy Service Worker (Opsional, agar lolos pengecekan PWA Chrome)
+            // 2. Dummy Service Worker (Menggunakan Blob, sering diblokir Chrome untuk auto-prompt, tapi cukup untuk lolos deteksi dasar)
             try {
                 const swCode = `
                     self.addEventListener('install', (e) => { self.skipWaiting(); });
@@ -1108,38 +1106,77 @@
                 }
             } catch(e) {}
 
-            // 3. Tangkap event install dari browser
+            // 3. Tangkap event install dari browser (Jika Chrome mengizinkan)
             window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault(); // Cegah prompt otomatis
-                deferredPrompt = e; // Simpan event
+                e.preventDefault(); 
+                deferredPrompt = e; 
             });
 
             // 4. Aksi saat tombol Install ditekan
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
-                    // Jika siap, tampilkan prompt instalasi asli dari browser
+                    // Jika Chrome mengizinkan prompt otomatis
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') {
-                        installBtn.classList.add('hidden'); // Sembunyikan setelah sukses diinstal
+                        installBtn.classList.add('hidden');
                     }
                     deferredPrompt = null;
                 } else {
-                    // Pesan peringatan yang baru
-                    const originalText = installBtn.innerHTML;
-                    installBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span class="text-[8px]">Refresh Halaman (F5)</span>';
-                    installBtn.classList.add('text-red-400', 'border-red-500/50');
-                    setTimeout(() => { 
-                        installBtn.innerHTML = originalText; 
-                        installBtn.classList.remove('text-red-400', 'border-red-500/50');
-                    }, 3000);
+                    // JIKA DIBLOKIR: Munculkan panel panduan cerdas (Message Box)
+                    showInstallGuide();
                 }
             });
 
-            // Sembunyikan tombol jika sudah berhasil diinstal sebelumnya
+            // Sembunyikan tombol jika sudah berhasil diinstal
             window.addEventListener('appinstalled', () => {
                 installBtn.classList.add('hidden');
             });
+
+            // Fungsi untuk membuat dan menampilkan panel panduan (tanpa menggunakan alert)
+            function showInstallGuide() {
+                // Hapus panel lama jika masih ada
+                const existing = document.getElementById('pwa-guide-modal');
+                if(existing) existing.remove();
+
+                const modal = document.createElement('div');
+                modal.id = 'pwa-guide-modal';
+                modal.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-[#000000] bg-opacity-80 backdrop-blur-sm transition-opacity';
+                
+                // Cek browser yang digunakan untuk menyesuaikan instruksi
+                const isEdge = navigator.userAgent.indexOf("Edg") > -1;
+                const menuIcon = isEdge ? "••• (Titik Tiga Horizontal)" : "⋮ (Titik Tiga Vertikal)";
+                const menuText = isEdge ? "Aplikasi > Instal situs ini sebagai aplikasi" : "Simpan dan Bagikan > Instal halaman sebagai aplikasi (Atau Install TNC7 Audio)";
+
+                modal.innerHTML = `
+                    <div class="bg-[#050a10] border border-yellow-500/30 shadow-[0_0_40px_rgba(234,179,8,0.15)] p-6 rounded-xl w-[450px] text-center main-glowing-panel relative transform transition-all scale-100">
+                        <div class="w-12 h-12 mx-auto bg-yellow-900/30 rounded-full flex items-center justify-center mb-3 border border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]">
+                            <i class="fas fa-desktop text-xl text-yellow-400"></i>
+                        </div>
+                        <h3 class="text-white font-bold tracking-widest mb-1 text-lg">INSTALASI MANUAL PC/HP</h3>
+                        <p class="text-slate-400 text-[11px] mb-4 font-mono leading-relaxed px-2">
+                            Sistem keamanan browser memblokir pop-up otomatis karena ini adalah halaman tunggal. Namun Anda <b class="text-white">tetap bisa menginstalnya</b> dengan fitur bawaan browser!
+                        </p>
+                        
+                        <div class="bg-[#03070c] rounded-lg p-4 border border-[#1f2937] text-left mb-5">
+                            <ol class="text-[11px] font-mono text-slate-300 space-y-2 list-decimal list-inside">
+                                <li>Klik ikon Menu <span class="text-yellow-400 font-bold">${menuIcon}</span> di pojok kanan atas browser Anda.</li>
+                                <li>Cari dan pilih opsi <span class="text-yellow-400 font-bold">"${menuText}"</span>.</li>
+                                <li>Klik <span class="text-yellow-400 font-bold">Install</span> pada jendela konfirmasi.</li>
+                            </ol>
+                        </div>
+
+                        <button id="close-guide-btn" class="btn-gradient w-full py-2.5 rounded-md text-white text-[11px] font-mono tracking-widest uppercase font-bold flex justify-center items-center gap-2">
+                            <i class="fas fa-check"></i> Saya Mengerti
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                document.getElementById('close-guide-btn').addEventListener('click', () => {
+                    modal.remove();
+                });
+            }
         })();
 
     </script>
