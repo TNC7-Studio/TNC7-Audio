@@ -134,18 +134,18 @@
         <!-- Tombol Install PWA -->
         <button id="install-pwa-btn" class="absolute top-4 right-4 z-50 bg-[#0a111a] hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[9px] font-mono tracking-widest uppercase font-bold py-1.5 px-3 rounded-md border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.1)] glowing-panel transition-all flex items-center space-x-1.5 cursor-pointer">
             <i class="fas fa-desktop"></i>
-            <span>Install</span>
+            <span>Instal</span>
         </button>
 
         <!-- Header -->
         <div class="text-center mb-3 flex flex-col items-center">
             <h1 class="text-4xl font-extrabold title-font mb-1 uppercase">
-                <span class="text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.5)]">TNC7</span> 
+                <span class="text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]">TNC7</span> 
                 <span class="text-gray-100 drop-shadow-[0_0_15px_rgba(243,244,246,0.2)]">AUDIO</span>
             </h1>
             <div class="inline-block px-3 py-0.5 mt-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 text-[10px] font-semibold tracking-wider">
                 <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block mr-1.5 animate-pulse"></span>
-                SYSTEM READY
+                SISTEM SIAP
             </div>
         </div>
 
@@ -160,9 +160,9 @@
                 <div class="w-10 h-10 rounded-lg bg-yellow-900/30 border border-yellow-500/40 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(234,179,8,0.2)]">
                     <i class="fas fa-cloud-upload-alt text-lg text-yellow-400"></i>
                 </div>
-                <h3 class="text-white font-bold tracking-widest mb-0.5 text-sm">UPLOAD</h3>
+                <h3 class="text-white font-bold tracking-widest mb-0.5 text-sm">UNGGAH AUDIO</h3>
                 <p class="text-slate-500 font-mono text-[10px] tracking-widest uppercase">
-                    DRAG & DROP AUDIO FILES
+                    SERET & LETAKKAN BERKAS AUDIO DI SINI
                 </p>
                 <div id="file-name-display" class="text-[10px] text-yellow-400 mt-1 font-mono font-semibold hidden truncate max-w-[250px] border border-yellow-500/30 bg-yellow-900/20 px-2 py-0.5 rounded"></div>
             </div>
@@ -177,7 +177,7 @@
         <div id="progress-container" class="bg-[#03070c] glowing-panel px-4 py-2 rounded-lg mb-3 flex flex-col gap-1">
             <div class="flex justify-between items-center text-[10px] font-mono text-slate-400 font-bold">
                 <span id="current-time">00:00</span>
-                <span id="track-status" class="text-yellow-500 tracking-wider uppercase">READY // NO TRACK LOADED</span>
+                <span id="track-status" class="text-yellow-500 tracking-wider uppercase">SIAP // BELUM ADA LAGU</span>
                 <span id="total-duration">00:00</span>
             </div>
             <div id="seek-bar" class="w-full py-1.5 cursor-pointer group relative touch-none">
@@ -201,7 +201,7 @@
                     
                     <!-- BPM Display -->
                     <div class="flex flex-col border-l border-[#1f2937] pl-3">
-                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold mb-0">Detected BPM</span>
+                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold mb-0">BPM Terdeteksi</span>
                         <div class="flex items-baseline space-x-1">
                             <span id="bpm-display" class="text-xl font-bold font-mono text-white drop-shadow-sm">--</span>
                             <span class="text-[9px] text-slate-500 font-mono tracking-widest uppercase">BPM</span>
@@ -210,7 +210,7 @@
 
                     <!-- Key / Chord Display -->
                     <div class="flex flex-col border-l border-[#1f2937] pl-3 ml-2">
-                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold mb-0">Base Key</span>
+                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold mb-0">Nada Dasar</span>
                         <div class="flex items-baseline space-x-1">
                             <span id="key-display" class="text-xl font-bold font-mono text-white drop-shadow-sm">--</span>
                         </div>
@@ -221,11 +221,11 @@
                 <div class="flex flex-row gap-2 w-auto">
                     <button id="analyze-btn" class="w-auto shrink-0 h-8 px-4 rounded-md bg-transparent hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[10px] font-mono tracking-widest uppercase font-bold border border-yellow-900 hover:border-yellow-500 transition-all flex items-center justify-center space-x-1.5">
                         <i class="fas fa-sync-alt"></i>
-                        <span>Detect</span>
+                        <span>Deteksi</span>
                     </button>
                     <button id="download-btn" class="w-auto shrink-0 h-8 px-4 rounded-md bg-yellow-600 hover:bg-yellow-500 text-white text-[10px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center space-x-1.5 shadow-lg shadow-yellow-900/20">
                         <i class="fas fa-download"></i>
-                        <span>Export</span>
+                        <span>Ekspor Kilat</span>
                     </button>
                 </div>
             </div>
@@ -238,7 +238,7 @@
                             <label class="text-[11px] font-bold text-yellow-400 font-mono tracking-wider">TEMPO</label>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button id="reset-tempo" class="w-5 h-5 rounded bg-[#111827] hover:bg-yellow-900/50 flex items-center justify-center text-slate-500 hover:text-yellow-400 transition-colors" title="Reset Tempo">
+                            <button id="reset-tempo" class="w-5 h-5 rounded bg-[#111827] hover:bg-yellow-900/50 flex items-center justify-center text-slate-500 hover:text-yellow-400 transition-colors" title="Atur Ulang Tempo">
                                 <i class="fas fa-undo text-[10px]"></i>
                             </button>
                             <span id="tempo-value" class="text-[11px] font-mono font-bold text-white bg-yellow-500/20 px-2 py-0.5 rounded min-w-[45px] text-center border border-yellow-500/30">1.00x</span>
@@ -258,10 +258,10 @@
                 <div class="bg-[#03070c] glowing-panel p-3 rounded-lg flex flex-col justify-center">
                     <div class="flex justify-between items-center mb-2 border-b border-yellow-500/20 pb-2">
                         <div class="flex items-center space-x-2">
-                            <label class="text-[11px] font-bold text-yellow-400 font-mono tracking-wider">PITCH</label>
+                            <label class="text-[11px] font-bold text-yellow-400 font-mono tracking-wider">PITCH / NADA</label>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button id="reset-pitch" class="w-5 h-5 rounded bg-[#111827] hover:bg-yellow-900/50 flex items-center justify-center text-slate-500 hover:text-yellow-400 transition-colors shadow-sm" title="Reset Pitch">
+                            <button id="reset-pitch" class="w-5 h-5 rounded bg-[#111827] hover:bg-yellow-900/50 flex items-center justify-center text-slate-500 hover:text-yellow-400 transition-colors shadow-sm" title="Atur Ulang Pitch">
                                 <i class="fas fa-undo text-[10px]"></i>
                             </button>
                             <span id="pitch-value" class="text-[11px] font-mono font-bold text-white bg-yellow-500/20 px-2 py-0.5 rounded min-w-[45px] text-center border border-yellow-500/30">0</span>
@@ -292,9 +292,9 @@
                     </button>
                 </div>
                 <!-- Tombol Anti Blok Suno -->
-                <button id="anti-suno-btn" class="w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-red-400 hover:border-red-500/50 transition-all flex items-center justify-center space-x-1.5 shadow-sm">
+                <button id="anti-suno-btn" class="w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5 shadow-sm">
                     <i class="fas fa-shield-alt"></i>
-                    <span>Anti Blok Suno : <span id="anti-suno-status">OFF</span></span>
+                    <span>Anti Blok Suno : <span id="anti-suno-status">MATI</span></span>
                 </button>
             </div>
         </div>
@@ -412,7 +412,7 @@
             
             if (!file.type.startsWith('audio/')) {
                 const originalText = uploadPrompt.innerHTML;
-                uploadPrompt.innerHTML = '<span class="text-red-400">Hanya file MP3/WAV/OGG!</span>';
+                uploadPrompt.innerHTML = '<span class="text-yellow-400">Hanya berkas MP3/WAV/OGG!</span>';
                 setTimeout(() => { uploadPrompt.innerHTML = originalText; }, 2000);
                 return;
             }
@@ -430,7 +430,7 @@
             uploadPrompt.querySelector('p').classList.add('hidden');
             loadingIndicator.classList.remove('hidden');
             canvas.style.opacity = '0';
-            loadingText.textContent = "Membaca file...";
+            loadingText.textContent = "Membaca berkas...";
 
             stopAudio();
             cleanupNodes();
@@ -438,13 +438,13 @@
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                loadingText.textContent = "Mendekode...";
+                loadingText.textContent = "Mendekode audio...";
                 initAudio(e.target.result);
             };
             reader.onerror = function() {
                 loadingIndicator.classList.add('hidden');
                 uploadPrompt.querySelector('p').classList.remove('hidden');
-                alert("Terjadi kesalahan saat membaca file.");
+                alert("Terjadi kesalahan saat membaca berkas.");
             }
             reader.readAsArrayBuffer(file);
         }
@@ -468,7 +468,7 @@
                 totalDurationEl.textContent = formatTime(duration);
                 currentTimeEl.textContent = "00:00";
                 seekProgress.style.width = "0%";
-                trackStatusEl.textContent = "READY // " + originalFileName.toUpperCase();
+                trackStatusEl.textContent = "SIAP // " + originalFileName.toUpperCase();
 
                 bpmDisplay.textContent = "...";
                 keyDisplay.textContent = "...";
@@ -479,10 +479,10 @@
                 }, 100); 
 
             } catch (error) {
-                console.error("Error decoding:", error);
+                console.error("Gagal mendekode:", error);
                 loadingIndicator.classList.add('hidden');
                 uploadPrompt.querySelector('p').classList.remove('hidden');
-                alert("Gagal mendekode file. Format mungkin tidak didukung.");
+                alert("Gagal mendekode berkas audio. Format mungkin tidak didukung.");
             }
         }
 
@@ -637,7 +637,7 @@
             
             playIcon.classList.remove('fa-play', 'ml-1');
             playIcon.classList.add('fa-pause');
-            trackStatusEl.textContent = "PLAYING // " + (preservePitch ? "PITCH LOCKED" : "CHIPMUNK MODE");
+            trackStatusEl.textContent = "MEMUTAR // " + (preservePitch ? "NADA DIKUNCI" : "EFEK TUPAI");
             
             sourceNode.onstop = () => {
                 if(isPlaying) {
@@ -665,9 +665,9 @@
             if(audioBuffer) {
                 currentTimeEl.textContent = "00:00";
                 seekProgress.style.width = "0%";
-                trackStatusEl.textContent = "READY // " + originalFileName.toUpperCase();
+                trackStatusEl.textContent = "SIAP // " + originalFileName.toUpperCase();
             } else {
-                trackStatusEl.textContent = "READY // NO TRACK LOADED";
+                trackStatusEl.textContent = "SIAP // BELUM ADA LAGU";
             }
             if(animationId) cancelAnimationFrame(animationId);
             clearCanvas();
@@ -694,7 +694,7 @@
             if(progressInterval) clearInterval(progressInterval);
             playIcon.classList.remove('fa-pause');
             playIcon.classList.add('fa-play', 'ml-1');
-            trackStatusEl.textContent = "PAUSED";
+            trackStatusEl.textContent = "DIJEDA";
             if(animationId) cancelAnimationFrame(animationId);
             clearCanvas();
         }
@@ -723,9 +723,9 @@
             
             document.querySelectorAll('.tempo-btn').forEach(btn => {
                 if (parseFloat(btn.getAttribute('data-val')) === val) {
-                    btn.className = "tempo-btn active-tempo px-2 py-1 rounded-lg text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all";
+                    btn.className = "tempo-btn active-tempo px-2 py-1 rounded-md text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all";
                 } else {
-                    btn.className = "tempo-btn px-2 py-1 rounded-lg text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all";
+                    btn.className = "tempo-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all";
                 }
             });
 
@@ -753,9 +753,9 @@
             
             document.querySelectorAll('.pitch-btn').forEach(btn => {
                 if (parseFloat(btn.getAttribute('data-val')) === val) {
-                    btn.className = "pitch-btn active-pitch px-2 py-1 rounded-lg text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all";
+                    btn.className = "pitch-btn active-pitch px-2 py-1 rounded-md text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all";
                 } else {
-                    btn.className = "pitch-btn px-2 py-1 rounded-lg text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all";
+                    btn.className = "pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all";
                 }
             });
 
@@ -781,8 +781,8 @@
 
         modePitchLock.addEventListener('click', () => {
             preservePitch = true;
-            modePitchLock.className = "mode-btn active-mode flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-2";
-            modeChipmunk.className = "mode-btn flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-2";
+            modePitchLock.className = "mode-btn active-mode flex-1 py-1.5 rounded-md text-[11px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-1.5";
+            modeChipmunk.className = "mode-btn flex-1 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5";
             
             if (sourceNode && pitchShiftNode) {
                 const tempoCompensation = -12 * Math.log2(playbackTempo);
@@ -792,8 +792,8 @@
 
         modeChipmunk.addEventListener('click', () => {
             preservePitch = false;
-            modeChipmunk.className = "mode-btn active-mode flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-2";
-            modePitchLock.className = "mode-btn flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-2";
+            modeChipmunk.className = "mode-btn active-mode flex-1 py-1.5 rounded-md text-[11px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-1.5";
+            modePitchLock.className = "mode-btn flex-1 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5";
             
             if (sourceNode && pitchShiftNode) {
                 pitchShiftNode.pitch = playbackPitch;
@@ -806,13 +806,13 @@
         antiSunoBtn.addEventListener('click', () => {
             antiSunoEnabled = !antiSunoEnabled;
             if (antiSunoEnabled) {
-                antiSunoBtn.className = "w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-red-900/30 border border-red-500 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.2)] transition-all flex items-center justify-center space-x-1.5";
-                antiSunoStatus.innerHTML = "ON <span class='text-[9px]'>(Extreme Mode)</span>";
+                antiSunoBtn.className = "w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-yellow-900/30 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all flex items-center justify-center space-x-1.5";
+                antiSunoStatus.innerHTML = "AKTIF <span class='text-[9px]'>(On)</span>";
                 antiSunoBtn.querySelector('i').classList.replace('fa-shield-alt', 'fa-shield-virus');
                 applyAntiSunoParams();
             } else {
-                antiSunoBtn.className = "w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-red-400 hover:border-red-500/50 transition-all flex items-center justify-center space-x-1.5";
-                antiSunoStatus.textContent = "OFF";
+                antiSunoBtn.className = "w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5";
+                antiSunoStatus.textContent = "MATI";
                 antiSunoBtn.querySelector('i').classList.replace('fa-shield-virus', 'fa-shield-alt');
                 applyAntiSunoParams();
             }
@@ -866,10 +866,9 @@
             }
 
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-            gradient.addColorStop(0, '#c700ff');   
-            gradient.addColorStop(0.3, '#ff00bb'); 
-            gradient.addColorStop(0.7, '#ff0000'); 
-            gradient.addColorStop(1, '#ff6600');   
+            gradient.addColorStop(0, '#eab308');   
+            gradient.addColorStop(0.5, '#ca8a04'); 
+            gradient.addColorStop(1, '#a16207');   
 
             for (let i = 0; i < numBars; i++) {
                 let sum = 0;
@@ -938,7 +937,7 @@
                 }
                 analyzeBtn.disabled = false;
             }).catch(function(err) {
-                console.error("BPM calculation error:", err);
+                console.error("Kesalahan perhitungan BPM:", err);
                 bpmDisplay.textContent = "ERR";
                 analyzeBtn.disabled = false;
             });
@@ -995,7 +994,6 @@
             return groups;
         }
 
-        // --- V5 STATE-OF-THE-ART ENGINE (Temperley-Gomez Hybrid) ---
         const MAJOR_PROFILE = [1.0, 0.1, 0.4, 0.1, 0.7, 0.5, 0.1, 0.8, 0.1, 0.5, 0.2, 0.4];
         const MINOR_PROFILE = [1.0, 0.1, 0.4, 0.7, 0.2, 0.5, 0.1, 0.8, 0.5, 0.1, 0.2, 0.4];
         const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
@@ -1004,19 +1002,16 @@
             if(!buffer) return;
             try {
                 const sampleRate = buffer.sampleRate;
-                // Analisis 45 detik untuk sampel yang lebih akurat
                 const durationToAnalyze = Math.min(buffer.duration, 45); 
                 const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, sampleRate * durationToAnalyze, sampleRate);
                 
                 const source = offlineCtx.createBufferSource();
                 source.buffer = buffer;
                 
-                // Anti-Noise: Saring hi-hats/cymbals agar mesin fokus ke nada (Bass & Mid)
                 const filter = offlineCtx.createBiquadFilter();
                 filter.type = "lowpass";
                 filter.frequency.value = 2500;
                 
-                // High-Resolution FFT untuk presisi mutlak di nada rendah
                 const analyser = offlineCtx.createAnalyser();
                 analyser.fftSize = 16384; 
                 analyser.smoothingTimeConstant = 0.5;
@@ -1027,8 +1022,7 @@
                 source.start(0);
 
                 const chroma = new Array(12).fill(0);
-                const step = 0.25; // Resolusi frame tinggi (4 kali per detik)
-                let framesProcessed = 0;
+                const step = 0.25; 
                 
                 for (let t = step; t < durationToAnalyze; t += step) {
                     offlineCtx.suspend(t).then(() => {
@@ -1042,33 +1036,25 @@
                             const freq = i * nyquist / data.length;
                             if (freq < 40 || freq > 2500) continue; 
                             
-                            const mag = Math.pow(10, data[i] / 20); // Skala linier
+                            const mag = Math.pow(10, data[i] / 20); 
                             if (mag > 0.01) {
                                 const exactPitch = 69 + 12 * Math.log2(freq / 440);
                                 const pitchClass = Math.round(exactPitch) % 12;
-                                
-                                // A-weighting approximation
-                                let weight = 1.0;
-                                if (freq < 100) weight = 0.5; // Redam sedikit sub-bass agar tak mendominasi
-                                
+                                let weight = (freq < 100) ? 0.5 : 1.0;
                                 frameChroma[pitchClass] += (mag * weight);
                             }
                         }
 
-                        // Frame Normalization
                         let frameSum = frameChroma.reduce((a, b) => a + b, 0);
                         if (frameSum > 0) {
                             for (let i = 0; i < 12; i++) chroma[i] += frameChroma[i] / frameSum;
-                            framesProcessed++;
                         }
-                        
                         offlineCtx.resume();
                     });
                 }
                 
                 await offlineCtx.startRendering();
                 
-                // Pearson Correlation
                 const chromaMean = chroma.reduce((a, b) => a + b, 0) / 12;
                 const profMajMean = MAJOR_PROFILE.reduce((a, b) => a + b, 0) / 12;
                 const profMinMean = MINOR_PROFILE.reduce((a, b) => a + b, 0) / 12;
@@ -1096,49 +1082,36 @@
                 results.sort((a, b) => b.score - a.score);
                 let bestMatch = results[0];
                 
-                // --- KOREKSI PRESISI MUTLAK (Triad Energy Analysis) ---
                 const cand1 = results[0];
                 const cand2 = results[1];
-                
-                // Cek apakah 2 kandidat teratas adalah Relative Keys (cth: C Maj vs A Min)
                 let isRelative = false;
                 if (cand1.isMajor !== cand2.isMajor) {
                     const relRoot1 = cand1.isMajor ? (cand1.root + 9) % 12 : (cand1.root + 3) % 12;
                     if (relRoot1 === cand2.root) isRelative = true;
                 }
 
-                // Jika selisih korelasi tipis dan mereka adalah Relative Keys
                 if (isRelative && Math.abs(cand1.score - cand2.score) < 0.25) {
-                    // Ekstrak Energi Akor (Root + 3rd + 5th)
                     const getTriadEnergy = (root, isMaj) => {
                         const third = (root + (isMaj ? 4 : 3)) % 12;
                         const fifth = (root + 7) % 12;
-                        // Bobot: Root paling penting, disusul 5th, lalu 3rd
                         return (chroma[root] * 1.5) + (chroma[fifth] * 1.2) + (chroma[third] * 1.0);
                     };
-
                     const energy1 = getTriadEnergy(cand1.root, cand1.isMajor);
                     const energy2 = getTriadEnergy(cand2.root, cand2.isMajor);
-
-                    // Berikan bias 10% ke Minor (Standar Industri Pop/EDM)
-                    const adjustedEnergy1 = cand1.isMajor ? energy1 : energy1 * 1.1;
-                    const adjustedEnergy2 = cand2.isMajor ? energy2 : energy2 * 1.1;
-
-                    if (adjustedEnergy2 > adjustedEnergy1) {
+                    if ((cand2.isMajor ? energy2 : energy2 * 1.1) > (cand1.isMajor ? energy1 : energy1 * 1.1)) {
                         bestMatch = cand2;
                     }
                 }
-                
                 keyDisplay.textContent = bestMatch.name || "--";
             } catch (err) {
-                console.error("Key detection error:", err);
+                console.error("Kesalahan deteksi nada:", err);
                 keyDisplay.textContent = "ERR";
             }
         }
 
         analyzeBtn.addEventListener('click', () => {
             if(!audioBuffer) {
-                alert("Silakan muat file audio terlebih dahulu!");
+                alert("Silakan muat berkas audio terlebih dahulu!");
                 return;
             }
             bpmDisplay.textContent = "...";
@@ -1150,85 +1123,144 @@
             }, 100);
         });
 
+        // --- MESIN EKSPOR KILAT SUPER CEPAT & PRESISI REAL-TIME ---
         downloadBtn.addEventListener('click', async () => {
             if (!audioBuffer) {
-                alert("Silakan muat file audio terlebih dahulu!");
+                alert("Silakan muat berkas audio terlebih dahulu!");
                 return;
             }
 
             downloadBtn.disabled = true;
-            const oldHtml = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Merender...</span>';
+            let currentPercent = 0;
+            downloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>0%</span>`;
 
-            let exportTempo = playbackTempo;
-            let exportPitch = playbackPitch;
-            const isChipmunk = !preservePitch;
+            // Cek apakah pengaturan berada di default (tanpa perubahan tempo, pitch, maupun efek)
+            const isDefault = (playbackTempo === 1.0 && playbackPitch === 0 && !antiSunoEnabled);
 
-            // EXTREME BYPASS V4: Hancurkan Constellation Fingerprint sepenuhnya
-            if (antiSunoEnabled) {
-                if (exportTempo === 1.0) exportTempo = 1.042; // +4.2% Time-warp distortion acak
-                if (exportPitch === 0) exportPitch = 0.85;    // +0.85 Semitone micro-shift
+            const startTime = performance.now();
+            const estRenderTime = isDefault ? 40 : Math.max(120, (audioBuffer.duration / playbackTempo) * 45);
+
+            let progressTimer = setInterval(() => {
+                const elapsed = performance.now() - startTime;
+                let progress = (elapsed / estRenderTime) * 99;
+                if (progress > 99) progress = 99;
+                
+                currentPercent = Math.floor(progress);
+                downloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>${currentPercent}%</span>`;
+            }, 10);
+
+            if (isPlaying) {
+                stopAudio();
             }
 
-            const newDuration = audioBuffer.duration / exportTempo;
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+            }
 
             try {
-                const renderedBuffer = await Tone.Offline(() => {
-                    const renderSource = new Tone.Player(audioBuffer);
-                    renderSource.playbackRate = exportTempo;
+                let renderedAudioBuffer;
 
-                    const tempoCompensation = isChipmunk ? 0 : (-12 * Math.log2(exportTempo));
-                    const exportPitchShift = new Tone.PitchShift({
-                        pitch: exportPitch + tempoCompensation,
-                        windowSize: 0.06
-                    });
+                if (isDefault) {
+                    // Jalur Cepat (Instant Export) jika tanpa modifikasi sama sekali
+                    renderedAudioBuffer = audioBuffer;
+                } else {
+                    const originalDuration = audioBuffer.duration;
+                    const effectiveDuration = originalDuration / playbackTempo;
+                    const targetSampleRate = audioBuffer.sampleRate;
 
-                    if (antiSunoEnabled) {
-                        const stealthChorus = new Tone.Chorus(6, 3.5, 0.8).start(0);
-                        const stealthPhaser = new Tone.Phaser({ frequency: 0.9, octaves: 4, baseFrequency: 220 });
-                        const stealthDistortion = new Tone.Distortion(0.04);
-                        const stealthFilter = new Tone.Filter(8500, "lowpass"); // Hancurkan total watermark ultrasonik di atas 8.5kHz
-                        
-                        renderSource.chain(exportPitchShift, stealthChorus, stealthPhaser, stealthDistortion, stealthFilter).toDestination();
-                    } else {
-                        renderSource.chain(exportPitchShift).toDestination();
-                    }
+                    const tempoCompensation = preservePitch ? (-12 * Math.log2(playbackTempo)) : 0;
+                    const totalPitch = playbackPitch + tempoCompensation;
 
-                    renderSource.start(0);
-                }, newDuration);
-                
-                const blob = encodeAudioBufferToMp3(renderedBuffer);
-                const suffix = antiSunoEnabled ? "AntiSuno_V4" : exportTempo.toFixed(2) + "x";
-                const defaultName = `${originalFileName}_${suffix}_TNC7_Audio.mp3`;
+                    const offlineResult = await Tone.Offline(async (context) => {
+                        const offlineAudioBuffer = context.createBuffer(
+                            audioBuffer.numberOfChannels,
+                            audioBuffer.length,
+                            audioBuffer.sampleRate
+                        );
+                        for (let channel = 0; channel < audioBuffer.numberOfChannels; channel++) {
+                            offlineAudioBuffer.copyToChannel(audioBuffer.getChannelData(channel), channel);
+                        }
 
-                const isIframe = window.self !== window.top;
+                        const offlinePlayer = new Tone.Player(offlineAudioBuffer);
+                        offlinePlayer.playbackRate = playbackTempo;
 
-                if (window.showSaveFilePicker && !isIframe) {
-                    try {
-                        const handle = await window.showSaveFilePicker({
-                            suggestedName: defaultName,
-                            types: [{
-                                description: 'MP3 Audio File',
-                                accept: {'audio/mpeg': ['.mp3']},
-                            }],
+                        const pitchShift = new Tone.PitchShift({
+                            windowSize: 0.08,
+                            pitch: totalPitch
                         });
-                        const writable = await handle.createWritable();
-                        await writable.write(blob);
-                        await writable.close();
-                    } catch (err) {
-                        if (err.name !== 'AbortError') {
+
+                        const chorus = new Tone.Chorus(5, 3, 0.7);
+                        const phaser = new Tone.Phaser({ frequency: 0.7, octaves: 4, baseFrequency: 250 });
+                        const distortion = new Tone.Distortion(0.08);
+                        const filter = new Tone.Filter(22000, "lowpass");
+
+                        if (antiSunoEnabled) {
+                            chorus.wet.value = 0.5;
+                            phaser.wet.value = 0.4;
+                            distortion.wet.value = 0.12;
+                            filter.frequency.value = 9500;
+                        } else {
+                            chorus.wet.value = 0;
+                            phaser.wet.value = 0;
+                            distortion.wet.value = 0;
+                            filter.frequency.value = 22000;
+                        }
+
+                        offlinePlayer.chain(pitchShift, chorus, phaser, distortion, filter, context.destination);
+                        offlinePlayer.start(0, 0);
+
+                    }, effectiveDuration, audioBuffer.numberOfChannels, targetSampleRate);
+
+                    renderedAudioBuffer = offlineResult.get();
+                }
+
+                clearInterval(progressTimer);
+                downloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>100%</span>`;
+
+                setTimeout(async () => {
+                    try {
+                        const blob = encodeAudioBufferToMp3(renderedAudioBuffer);
+
+                        let originalBpm = bpmDisplay.textContent.trim();
+                        let originalKey = keyDisplay.textContent.trim();
+                        let cleanFileName = originalFileName.replace(/_/g, " ");
+                        const suffix = playbackTempo.toFixed(2) + "x";
+                        
+                        let defaultName = `${cleanFileName} ${suffix} ${originalBpm} BPM ${originalKey} TNC7 Audio.mp3`.replace(/_/g, " ");
+
+                        const isIframe = window.self !== window.top;
+                        if (window.showSaveFilePicker && !isIframe) {
+                            try {
+                                const handle = await window.showSaveFilePicker({
+                                    suggestedName: defaultName,
+                                    types: [{ description: 'Berkas Audio MP3', accept: {'audio/mpeg': ['.mp3']} }],
+                                });
+                                const writable = await handle.createWritable();
+                                await writable.write(blob);
+                                await writable.close();
+                            } catch (err) {
+                                if (err.name !== 'AbortError') fallbackDownload(blob, defaultName);
+                            }
+                        } else {
                             fallbackDownload(blob, defaultName);
                         }
+                        downloadBtn.disabled = false;
+                        downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>Ekspor Kilat</span>';
+
+                    } catch (err) {
+                        console.error("Kesalahan pengkodean ekspor:", err);
+                        alert("Gagal mengonversi audio ke MP3.");
+                        downloadBtn.disabled = false;
+                        downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>Ekspor Kilat</span>';
                     }
-                } else {
-                    fallbackDownload(blob, defaultName);
-                }
-            } catch (error) {
-                console.error("Export error:", error);
-                alert("Terjadi kesalahan saat mengekspor audio.");
-            } finally {
+                }, 50);
+
+            } catch (err) {
+                clearInterval(progressTimer);
+                console.error("Kesalahan render offline:", err);
                 downloadBtn.disabled = false;
-                downloadBtn.innerHTML = oldHtml;
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>Ekspor Kilat</span>';
+                alert("Gagal merender audio kilat. Silakan coba lagi.");
             }
         });
 
@@ -1299,47 +1331,11 @@
                 ]
             };
             
-            const manifestString = JSON.stringify(manifestJSON);
-            const manifestDataUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(manifestString);
-            
+            const manifestDataUrl = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifestJSON));
             const manifestLink = document.createElement('link');
             manifestLink.rel = 'manifest';
             manifestLink.href = manifestDataUrl;
             document.head.appendChild(manifestLink);
-
-            try {
-                const swCode = `
-                    const CACHE_NAME = 'tnc7-audio-core-v2';
-                    self.addEventListener('install', (e) => { self.skipWaiting(); });
-                    self.addEventListener('activate', (e) => { 
-                        e.waitUntil(
-                            caches.keys().then(keys => Promise.all(
-                                keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-                            )).then(() => self.clients.claim())
-                        ); 
-                    });
-                    self.addEventListener('fetch', (e) => { 
-                        if (e.request.url.startsWith('http')) {
-                            e.respondWith(
-                                caches.match(e.request).then(cachedRes => {
-                                    const fetchPromise = fetch(e.request).then(networkRes => {
-                                        if (networkRes && networkRes.status === 200) {
-                                            const resClone = networkRes.clone();
-                                            caches.open(CACHE_NAME).then(cache => cache.put(e.request, resClone));
-                                        }
-                                        return networkRes;
-                                    }).catch(() => {});
-                                    return cachedRes || fetchPromise;
-                                })
-                            );
-                        }
-                    });
-                `;
-                const swBlob = new Blob([swCode], { type: 'application/javascript' });
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
-                }
-            } catch(e) {}
 
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault(); 
@@ -1350,17 +1346,11 @@
                 if (deferredPrompt) {
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        installBtn.classList.add('hidden');
-                    }
+                    if (outcome === 'accepted') installBtn.classList.add('hidden');
                     deferredPrompt = null;
                 } else {
                     showInstallGuide();
                 }
-            });
-
-            window.addEventListener('appinstalled', () => {
-                installBtn.classList.add('hidden');
             });
 
             function showInstallGuide() {
@@ -1376,33 +1366,28 @@
                 const menuText = isEdge ? "Aplikasi > Instal situs ini sebagai aplikasi" : "Simpan dan Bagikan > Instal halaman sebagai aplikasi";
 
                 modal.innerHTML = `
-                    <div class="bg-[#050a10] border border-yellow-500/30 shadow-[0_0_40px_rgba(234,179,8,0.15)] p-6 rounded-xl w-[450px] text-center main-glowing-panel relative transform transition-all scale-100">
+                    <div class="bg-[#050a10] border border-yellow-500/30 shadow-[0_0_40px_rgba(234,179,8,0.15)] p-6 rounded-xl w-[450px] text-center main-glowing-panel relative">
                         <div class="w-12 h-12 mx-auto bg-yellow-900/30 rounded-full flex items-center justify-center mb-3 border border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.2)]">
                             <i class="fas fa-desktop text-xl text-yellow-400"></i>
                         </div>
-                        <h3 class="text-white font-bold tracking-widest mb-1 text-lg">INSTALASI MANUAL PC/HP</h3>
+                        <h3 class="text-white font-bold tracking-widest mb-1 text-lg">PANDUAN INSTALASI</h3>
                         <p class="text-slate-400 text-[11px] mb-4 font-mono leading-relaxed px-2">
-                            Sistem keamanan browser memblokir pop-up otomatis. Anda <b class="text-white">tetap bisa menginstalnya</b> melalui menu browser:
+                            Keamanan peramban membatasi pop-up otomatis. Anda <b class="text-white">tetap dapat memasangnya</b> melalui menu peramban:
                         </p>
-                        
-                        <div class="bg-[#03070c] rounded-lg p-4 border border-[#1f2937] text-left mb-5">
+                        <div class="bg-[#03070c] rounded-lg p-4 border border-[#1f2937] (text-left) mb-5">
                             <ol class="text-[11px] font-mono text-slate-300 space-y-2 list-decimal list-inside">
-                                <li>Klik ikon Menu <span class="text-yellow-400 font-bold">${menuIcon}</span> di pojok kanan atas.</li>
+                                <li>Klik ikon Menu <span class="text-yellow-400 font-bold">${menuIcon}</span> di sudut kanan atas.</li>
                                 <li>Pilih opsi <span class="text-yellow-400 font-bold">"${menuText}"</span>.</li>
-                                <li>Klik <span class="text-yellow-400 font-bold">Install</span>.</li>
+                                <li>Klik <span class="text-yellow-400 font-bold">Instal</span>.</li>
                             </ol>
                         </div>
-
                         <button id="close-guide-btn" class="btn-gradient w-full py-2.5 rounded-md text-white text-[11px] font-mono tracking-widest uppercase font-bold flex justify-center items-center gap-2">
                             <i class="fas fa-check"></i> Saya Mengerti
                         </button>
                     </div>
                 `;
                 document.body.appendChild(modal);
-
-                document.getElementById('close-guide-btn').addEventListener('click', () => {
-                    modal.remove();
-                });
+                document.getElementById('close-guide-btn').addEventListener('click', () => modal.remove());
             }
         })();
     </script>
