@@ -22,17 +22,15 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #03070c; /* Sangat gelap, hampir hitam murni */
+            background-color: #03070c;
             background-image: 
                 radial-gradient(at 0% 0%, rgba(5, 10, 15, 1) 0, transparent 50%), 
                 radial-gradient(at 100% 100%, rgba(2, 5, 8, 1) 0, transparent 50%);
             color: #f8fafc;
-            /* Mencegah seleksi teks */
             user-select: none;
             -webkit-user-select: none;
         }
 
-        /* Menyembunyikan input range standar karena kita menggunakan tombol */
         input[type=range] {
             display: none;
         }
@@ -40,7 +38,7 @@
         .visualizer-container {
             background-color: #050a10;
             position: relative;
-            height: 90px; /* Dikembalikan ke ukuran yang cukup terlihat */
+            height: 90px;
             width: 100%;
             border-radius: 0.5rem;
             overflow: hidden;
@@ -50,7 +48,7 @@
 
         .visualizer-container:hover {
             border-color: #ca8a04;
-            background-color: rgba(234, 179, 8, 0.05); /* Sedikit glow saat hover */
+            background-color: rgba(234, 179, 8, 0.05);
         }
 
         .visualizer-container.dragover {
@@ -60,7 +58,7 @@
         }
 
         .btn-gradient {
-            background: linear-gradient(135deg, #ca8a04 0%, #a16207 100%); /* Tema kuning */
+            background: linear-gradient(135deg, #ca8a04 0%, #a16207 100%);
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(202, 138, 4, 0.2);
         }
@@ -82,7 +80,6 @@
             50% { opacity: 1; }
         }
 
-        /* Custom Scrollbar (jika konten memanjang) */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -97,13 +94,11 @@
             background: #1f2937; 
         }
         
-        /* Font khusus untuk judul agar mirip gambar */
         .title-font {
             font-family: 'Plus Jakarta Sans', sans-serif;
             letter-spacing: 0.02em;
         }
 
-        /* Class untuk efek glow tipis pada panel-panel dalam */
         .glowing-panel {
             border: 1px solid rgba(234, 179, 8, 0.2);
             box-shadow: 0 0 12px rgba(234, 179, 8, 0.06), inset 0 0 5px rgba(234, 179, 8, 0.02);
@@ -114,7 +109,6 @@
             box-shadow: 0 0 18px rgba(234, 179, 8, 0.12), inset 0 0 8px rgba(234, 179, 8, 0.04);
         }
 
-        /* Class khusus panel utama (menggabungkan bayangan gelap & glow terang) */
         .main-glowing-panel {
             border: 1px solid rgba(234, 179, 8, 0.25);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 1), 0 0 20px rgba(234, 179, 8, 0.08), inset 0 0 8px rgba(234, 179, 8, 0.03);
@@ -125,7 +119,6 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 1), 0 0 25px rgba(234, 179, 8, 0.15), inset 0 0 12px rgba(234, 179, 8, 0.05);
         }
 
-        /* TAMBAHAN: Menyembunyikan tombol install secara absolut saat sudah diinstal di PC */
         @media all and (display-mode: standalone) {
             #install-pwa-btn {
                 display: none !important;
@@ -135,10 +128,10 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 relative overflow-hidden min-w-[850px]" oncontextmenu="return false;">
 
-    <!-- Main Card matching the screenshot's matte dark look -->
+    <!-- Main Card -->
     <div class="bg-[#050a10] main-glowing-panel p-4 rounded-xl w-[800px] shrink-0 relative z-10 mt-2">
         
-        <!-- Tombol Install PWA (Sekarang dibuat selalu tampil agar bisa dilihat posisinya) -->
+        <!-- Tombol Install PWA -->
         <button id="install-pwa-btn" class="absolute top-4 right-4 z-50 bg-[#0a111a] hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[9px] font-mono tracking-widest uppercase font-bold py-1.5 px-3 rounded-md border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.1)] glowing-panel transition-all flex items-center space-x-1.5 cursor-pointer">
             <i class="fas fa-desktop"></i>
             <span>Install</span>
@@ -156,7 +149,7 @@
             </div>
         </div>
 
-        <!-- Visualizer Area (Click/Drop to upload) -->
+        <!-- Visualizer Area -->
         <div id="drop-area" class="visualizer-container mb-3 cursor-pointer group flex items-center justify-center relative">
             <input type="file" id="audio-file" accept="audio/mpeg, audio/mp3, audio/wav, audio/ogg" class="hidden">
             
@@ -174,7 +167,7 @@
                 <div id="file-name-display" class="text-[10px] text-yellow-400 mt-1 font-mono font-semibold hidden truncate max-w-[250px] border border-yellow-500/30 bg-yellow-900/20 px-2 py-0.5 rounded"></div>
             </div>
 
-            <!-- Loading State inside visualizer -->
+            <!-- Loading State -->
             <div id="loading-indicator" class="hidden z-20 flex flex-col items-center text-yellow-400">
                 <i class="fas fa-circle-notch fa-spin text-2xl mb-1"></i>
                 <span id="loading-text" class="text-[10px] font-mono tracking-widest uppercase font-semibold pulse-text">Memproses Audio...</span>
@@ -187,7 +180,6 @@
                 <span id="track-status" class="text-yellow-500 tracking-wider uppercase">READY // NO TRACK LOADED</span>
                 <span id="total-duration">00:00</span>
             </div>
-            <!-- Custom Clickable/Draggable Progress Track -->
             <div id="seek-bar" class="w-full py-1.5 cursor-pointer group relative touch-none">
                 <div id="seek-track" class="w-full h-2 bg-[#111827] rounded-full relative">
                     <div id="seek-progress" class="h-full bg-yellow-500 w-0 relative rounded-full pointer-events-none">
@@ -198,7 +190,7 @@
         </div>
 
         <div id="player-controls" class="space-y-3">
-            <!-- Row 1: Status Bar (Play, BPM, Detect) -->
+            <!-- Row 1: Status Bar (Play, BPM, Key, Detect, Export) -->
             <div class="bg-[#03070c] glowing-panel p-2 rounded-lg flex flex-row items-center justify-between gap-3">
                 
                 <!-- Play Button -->
@@ -213,6 +205,14 @@
                         <div class="flex items-baseline space-x-1">
                             <span id="bpm-display" class="text-xl font-bold font-mono text-white drop-shadow-sm">--</span>
                             <span class="text-[9px] text-slate-500 font-mono tracking-widest uppercase">BPM</span>
+                        </div>
+                    </div>
+
+                    <!-- Key / Chord Display -->
+                    <div class="flex flex-col border-l border-[#1f2937] pl-3 ml-2">
+                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold mb-0">Base Key</span>
+                        <div class="flex items-baseline space-x-1">
+                            <span id="key-display" class="text-xl font-bold font-mono text-white drop-shadow-sm">--</span>
                         </div>
                     </div>
                 </div>
@@ -231,7 +231,6 @@
             </div>
 
             <div class="grid grid-cols-2 gap-3">
-                
                 <!-- Tempo Control -->
                 <div class="bg-[#03070c] glowing-panel p-3 rounded-lg flex flex-col justify-center">
                     <div class="flex justify-between items-center mb-2 border-b border-yellow-500/20 pb-2">
@@ -246,7 +245,6 @@
                         </div>
                     </div>
                     
-                    <!-- Tempo Buttons -->
                     <div class="flex flex-wrap gap-1.5 justify-center" id="tempo-buttons-container">
                         <button class="tempo-btn active-tempo px-2 py-1 rounded-md text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all" data-val="1.0">1.0x</button>
                         <button class="tempo-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="2.0">2.0x</button>
@@ -270,7 +268,6 @@
                         </div>
                     </div>
                     
-                    <!-- Pitch Buttons -->
                     <div class="flex flex-wrap gap-1.5 justify-center" id="pitch-buttons-container">
                         <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="-12">-12</button>
                         <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="-6">-6</button>
@@ -294,15 +291,17 @@
                         <span>Efek Tupai</span>
                     </button>
                 </div>
+                <!-- Tombol Anti Blok Suno -->
+                <button id="anti-suno-btn" class="w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-red-400 hover:border-red-500/50 transition-all flex items-center justify-center space-x-1.5 shadow-sm">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Anti Blok Suno : <span id="anti-suno-status">OFF</span></span>
+                </button>
             </div>
-
         </div>
     </div>
 
-    <!-- Script to disable some basic developer tools shortcuts (opsional tambahan perlindungan) -->
     <script>
         document.addEventListener('keydown', function(e) {
-            // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
             if(e.key === "F12" || 
               (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C")) || 
               (e.ctrlKey && e.key === "U")) {
@@ -324,6 +323,7 @@
         const pitchValueDisplay = document.getElementById('pitch-value');
         const resetPitchBtn = document.getElementById('reset-pitch');
         const bpmDisplay = document.getElementById('bpm-display');
+        const keyDisplay = document.getElementById('key-display');
         const analyzeBtn = document.getElementById('analyze-btn');
         const downloadBtn = document.getElementById('download-btn');
         const canvas = document.getElementById('visualizer');
@@ -331,7 +331,6 @@
         const loadingIndicator = document.getElementById('loading-indicator');
         const loadingText = document.getElementById('loading-text');
 
-        // New DOM elements for progress and duration
         const currentTimeEl = document.getElementById('current-time');
         const totalDurationEl = document.getElementById('total-duration');
         const trackStatusEl = document.getElementById('track-status');
@@ -354,9 +353,19 @@
         let pitchShiftNode = null; 
         let progressInterval = null;
         let isDraggingSeek = false;
-        let capYPositionArray = []; // TAMBAHAN: Array untuk menyimpan posisi "topi" putih visualizer
+        let capYPositionArray = [];
+        
+        let antiSunoEnabled = false;
+        let antiSunoChorus = null;
+        let antiSunoPhaser = null;
+        let antiSunoDistortion = null;
+        let antiSunoFilter = null;
 
-        // Format seconds to MM:SS
+        document.body.addEventListener('click', async () => {
+            if (Tone.context.state !== 'running') await Tone.start();
+            if (audioContext && audioContext.state !== 'running') await audioContext.resume();
+        }, { once: true });
+
         function formatTime(seconds) {
             if (isNaN(seconds) || seconds < 0) return "00:00";
             const mins = Math.floor(seconds / 60);
@@ -364,12 +373,10 @@
             return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
         }
 
-        // Trigger file input when clicking visualizer area
         dropArea.addEventListener('click', () => {
             fileInput.click();
         });
 
-        // Drag and Drop Handling on visualizer area
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropArea.addEventListener(eventName, preventDefaults, false);
         });
@@ -426,6 +433,7 @@
             loadingText.textContent = "Membaca file...";
 
             stopAudio();
+            cleanupNodes();
             resetControls();
 
             const reader = new FileReader();
@@ -456,7 +464,6 @@
                 resizeCanvas();
                 clearCanvas();
                 
-                // Update duration displays
                 const duration = audioBuffer.duration;
                 totalDurationEl.textContent = formatTime(duration);
                 currentTimeEl.textContent = "00:00";
@@ -464,9 +471,11 @@
                 trackStatusEl.textContent = "READY // " + originalFileName.toUpperCase();
 
                 bpmDisplay.textContent = "...";
+                keyDisplay.textContent = "...";
                 analyzeBtn.disabled = true;
                 setTimeout(() => {
                     calculateBPM(audioBuffer);
+                    detectKey(audioBuffer);
                 }, 100); 
 
             } catch (error) {
@@ -477,7 +486,6 @@
             }
         }
 
-        // Fungsi untuk menghitung persentase dan mengupdate UI & Audio
         function getClientX(e) {
             if (e.touches && e.touches.length > 0) return e.touches[0].clientX;
             if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0].clientX;
@@ -506,7 +514,7 @@
             wasPlayingBeforeDrag = isPlaying;
             
             if (isPlaying) {
-                isPlaying = false; // Mencegah onstop me-reset penuh posisi
+                isPlaying = false;
                 if (sourceNode) {
                     sourceNode.stop();
                     sourceNode.dispose();
@@ -531,7 +539,7 @@
                 updateSeekPosition(e);
                 
                 if (wasPlayingBeforeDrag) {
-                    playAudio(); // Mainkan kembali dari posisi baru
+                    playAudio();
                 } else {
                     currentTimeEl.textContent = formatTime(pausedAt);
                     const percentage = pausedAt / audioBuffer.duration;
@@ -540,15 +548,29 @@
             }
         }
 
-        // Mouse Events
         seekBar.addEventListener('mousedown', handleDragStart);
         document.addEventListener('mousemove', handleDragMove);
         document.addEventListener('mouseup', handleDragEnd);
 
-        // Touch Events untuk Mobile & Sentuhan Halus
         seekBar.addEventListener('touchstart', handleDragStart, { passive: false });
         document.addEventListener('touchmove', handleDragMove, { passive: false });
         document.addEventListener('touchend', handleDragEnd);
+
+        function applyAntiSunoParams() {
+            if (antiSunoChorus && antiSunoPhaser && antiSunoDistortion && antiSunoFilter) {
+                if (antiSunoEnabled) {
+                    antiSunoChorus.wet.value = 0.5;
+                    antiSunoPhaser.wet.value = 0.4;
+                    antiSunoDistortion.wet.value = 0.12;
+                    antiSunoFilter.frequency.value = 9500;
+                } else {
+                    antiSunoChorus.wet.value = 0;
+                    antiSunoPhaser.wet.value = 0;
+                    antiSunoDistortion.wet.value = 0;
+                    antiSunoFilter.frequency.value = 22000;
+                }
+            }
+        }
 
         function updateProgress() {
             if (!isPlaying || !audioBuffer || isDraggingSeek) return;
@@ -586,7 +608,17 @@
                     windowSize: 0.1,
                     pitch: 0
                 });
-                pitchShiftNode.connect(analyserNode);
+                
+                antiSunoChorus = new Tone.Chorus(5, 3, 0.7).start();
+                antiSunoPhaser = new Tone.Phaser({ frequency: 0.7, octaves: 4, baseFrequency: 250 });
+                antiSunoDistortion = new Tone.Distortion(0.08);
+                antiSunoFilter = new Tone.Filter(22000, "lowpass");
+                
+                antiSunoChorus.wet.value = 0;
+                antiSunoPhaser.wet.value = 0;
+                antiSunoDistortion.wet.value = 0;
+                
+                pitchShiftNode.chain(antiSunoChorus, antiSunoPhaser, antiSunoDistortion, antiSunoFilter, analyserNode);
             }
 
             sourceNode = new Tone.Player(audioBuffer);
@@ -595,6 +627,8 @@
             const tempoCompensation = preservePitch ? (-12 * Math.log2(playbackTempo)) : 0;
             pitchShiftNode.pitch = playbackPitch + tempoCompensation;
 
+            applyAntiSunoParams();
+            
             sourceNode.connect(pitchShiftNode);
 
             sourceNode.start(0, pausedAt);
@@ -639,6 +673,15 @@
             clearCanvas();
         }
 
+        function cleanupNodes() {
+            if (pitchShiftNode) { pitchShiftNode.dispose(); pitchShiftNode = null; }
+            if (antiSunoChorus) { antiSunoChorus.dispose(); antiSunoChorus = null; }
+            if (antiSunoPhaser) { antiSunoPhaser.dispose(); antiSunoPhaser = null; }
+            if (antiSunoDistortion) { antiSunoDistortion.dispose(); antiSunoDistortion = null; }
+            if (antiSunoFilter) { antiSunoFilter.dispose(); antiSunoFilter = null; }
+            if (analyserNode) { analyserNode.disconnect(); analyserNode = null; }
+        }
+
         function pauseAudio() {
             if (sourceNode) {
                 sourceNode.stop();
@@ -658,11 +701,9 @@
 
         playBtn.addEventListener('click', (e) => {
             e.stopPropagation(); 
-            
             if (audioContext && audioContext.state === 'suspended') {
                 audioContext.resume();
             }
-
             if (isPlaying) {
                 pauseAudio();
             } else {
@@ -672,7 +713,6 @@
 
         function setTempo(val) {
             if (isPlaying) {
-                // Kalkulasi ulang posisi jika tempo diganti secara live agar tidak loncat
                 const effectiveElapsed = (audioContext.currentTime - startedAt) * playbackTempo;
                 pausedAt = Math.min(audioBuffer.duration, pausedAt + effectiveElapsed);
                 startedAt = audioContext.currentTime;
@@ -760,10 +800,29 @@
             }
         });
 
+        const antiSunoBtn = document.getElementById('anti-suno-btn');
+        const antiSunoStatus = document.getElementById('anti-suno-status');
+
+        antiSunoBtn.addEventListener('click', () => {
+            antiSunoEnabled = !antiSunoEnabled;
+            if (antiSunoEnabled) {
+                antiSunoBtn.className = "w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-red-900/30 border border-red-500 text-red-400 shadow-[0_0_10px_rgba(239,68,68,0.2)] transition-all flex items-center justify-center space-x-1.5";
+                antiSunoStatus.innerHTML = "ON <span class='text-[9px]'>(Extreme Mode)</span>";
+                antiSunoBtn.querySelector('i').classList.replace('fa-shield-alt', 'fa-shield-virus');
+                applyAntiSunoParams();
+            } else {
+                antiSunoBtn.className = "w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-red-400 hover:border-red-500/50 transition-all flex items-center justify-center space-x-1.5";
+                antiSunoStatus.textContent = "OFF";
+                antiSunoBtn.querySelector('i').classList.replace('fa-shield-virus', 'fa-shield-alt');
+                applyAntiSunoParams();
+            }
+        });
+
         function resetControls() {
             setTempo(1.0);
             setPitch(0);
             bpmDisplay.textContent = '--';
+            keyDisplay.textContent = '--';
         }
 
         function resizeCanvas() {
@@ -777,13 +836,11 @@
         function clearCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.beginPath();
-            // Garis standby diubah ke bagian bawah (baseline)
             ctx.moveTo(0, canvas.height - 1);
             ctx.lineTo(canvas.width, canvas.height - 1);
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)'; 
             ctx.lineWidth = 2;
             ctx.stroke();
-            
             capYPositionArray = [];
         }
 
@@ -794,19 +851,14 @@
 
             const bufferLength = analyserNode.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
-            
             analyserNode.getByteFrequencyData(dataArray);
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             const gap = 3;
             const targetBarWidth = 10;
-            // Menghitung jumlah bar maksimum yang muat secara proporsional
             const numBars = Math.floor((canvas.width + gap) / (targetBarWidth + gap));
-            
-            // KALKULASI PRESISI: Menyesuaikan lebar bar agar pas menutupi celah di sisi kanan
             const barWidth = (canvas.width - ((numBars - 1) * gap)) / numBars;
-            
             const step = Math.floor((bufferLength * 0.5) / numBars); 
 
             if (capYPositionArray.length !== numBars) {
@@ -829,7 +881,6 @@
                 const percent = value / 255;
                 const barHeight = percent * (canvas.height - 15);
                 
-                // Koordinat X sekarang akan presisi hingga ke piksel terakhir
                 const x = i * (barWidth + gap);
                 const y = canvas.height - barHeight;
 
@@ -916,7 +967,6 @@
             peaks.sort((a, b) => b.volume - a.volume);
             peaks = peaks.splice(0, Math.floor(peaks.length * 0.5));
             peaks.sort((a, b) => a.position - b.position);
-            
             return peaks;
         }
 
@@ -945,15 +995,158 @@
             return groups;
         }
 
+        // --- V5 STATE-OF-THE-ART ENGINE (Temperley-Gomez Hybrid) ---
+        const MAJOR_PROFILE = [1.0, 0.1, 0.4, 0.1, 0.7, 0.5, 0.1, 0.8, 0.1, 0.5, 0.2, 0.4];
+        const MINOR_PROFILE = [1.0, 0.1, 0.4, 0.7, 0.2, 0.5, 0.1, 0.8, 0.5, 0.1, 0.2, 0.4];
+        const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+        async function detectKey(buffer) {
+            if(!buffer) return;
+            try {
+                const sampleRate = buffer.sampleRate;
+                // Analisis 45 detik untuk sampel yang lebih akurat
+                const durationToAnalyze = Math.min(buffer.duration, 45); 
+                const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, sampleRate * durationToAnalyze, sampleRate);
+                
+                const source = offlineCtx.createBufferSource();
+                source.buffer = buffer;
+                
+                // Anti-Noise: Saring hi-hats/cymbals agar mesin fokus ke nada (Bass & Mid)
+                const filter = offlineCtx.createBiquadFilter();
+                filter.type = "lowpass";
+                filter.frequency.value = 2500;
+                
+                // High-Resolution FFT untuk presisi mutlak di nada rendah
+                const analyser = offlineCtx.createAnalyser();
+                analyser.fftSize = 16384; 
+                analyser.smoothingTimeConstant = 0.5;
+                
+                source.connect(filter);
+                filter.connect(analyser);
+                analyser.connect(offlineCtx.destination);
+                source.start(0);
+
+                const chroma = new Array(12).fill(0);
+                const step = 0.25; // Resolusi frame tinggi (4 kali per detik)
+                let framesProcessed = 0;
+                
+                for (let t = step; t < durationToAnalyze; t += step) {
+                    offlineCtx.suspend(t).then(() => {
+                        const data = new Float32Array(analyser.frequencyBinCount);
+                        analyser.getFloatFrequencyData(data);
+                        
+                        const nyquist = sampleRate / 2;
+                        let frameChroma = new Array(12).fill(0);
+                        
+                        for (let i = 0; i < data.length; i++) {
+                            const freq = i * nyquist / data.length;
+                            if (freq < 40 || freq > 2500) continue; 
+                            
+                            const mag = Math.pow(10, data[i] / 20); // Skala linier
+                            if (mag > 0.01) {
+                                const exactPitch = 69 + 12 * Math.log2(freq / 440);
+                                const pitchClass = Math.round(exactPitch) % 12;
+                                
+                                // A-weighting approximation
+                                let weight = 1.0;
+                                if (freq < 100) weight = 0.5; // Redam sedikit sub-bass agar tak mendominasi
+                                
+                                frameChroma[pitchClass] += (mag * weight);
+                            }
+                        }
+
+                        // Frame Normalization
+                        let frameSum = frameChroma.reduce((a, b) => a + b, 0);
+                        if (frameSum > 0) {
+                            for (let i = 0; i < 12; i++) chroma[i] += frameChroma[i] / frameSum;
+                            framesProcessed++;
+                        }
+                        
+                        offlineCtx.resume();
+                    });
+                }
+                
+                await offlineCtx.startRendering();
+                
+                // Pearson Correlation
+                const chromaMean = chroma.reduce((a, b) => a + b, 0) / 12;
+                const profMajMean = MAJOR_PROFILE.reduce((a, b) => a + b, 0) / 12;
+                const profMinMean = MINOR_PROFILE.reduce((a, b) => a + b, 0) / 12;
+
+                const chromaDenom = Math.sqrt(chroma.reduce((acc, val) => acc + Math.pow(val - chromaMean, 2), 0));
+                const majDenom = Math.sqrt(MAJOR_PROFILE.reduce((acc, val) => acc + Math.pow(val - profMajMean, 2), 0));
+                const minDenom = Math.sqrt(MINOR_PROFILE.reduce((acc, val) => acc + Math.pow(val - profMinMean, 2), 0));
+
+                let results = [];
+                for (let shift = 0; shift < 12; shift++) {
+                    let covMaj = 0, covMin = 0;
+                    for (let i = 0; i < 12; i++) {
+                        const profileIdx = (i - shift + 12) % 12;
+                        covMaj += (chroma[i] - chromaMean) * (MAJOR_PROFILE[profileIdx] - profMajMean);
+                        covMin += (chroma[i] - chromaMean) * (MINOR_PROFILE[profileIdx] - profMinMean);
+                    }
+                    
+                    let corrMajor = covMaj / ((chromaDenom * majDenom) || 1);
+                    let corrMinor = covMin / ((chromaDenom * minDenom) || 1);
+                    
+                    results.push({ name: NOTE_NAMES[shift] + " Maj", root: shift, isMajor: true, score: corrMajor });
+                    results.push({ name: NOTE_NAMES[shift] + " Min", root: shift, isMajor: false, score: corrMinor });
+                }
+                
+                results.sort((a, b) => b.score - a.score);
+                let bestMatch = results[0];
+                
+                // --- KOREKSI PRESISI MUTLAK (Triad Energy Analysis) ---
+                const cand1 = results[0];
+                const cand2 = results[1];
+                
+                // Cek apakah 2 kandidat teratas adalah Relative Keys (cth: C Maj vs A Min)
+                let isRelative = false;
+                if (cand1.isMajor !== cand2.isMajor) {
+                    const relRoot1 = cand1.isMajor ? (cand1.root + 9) % 12 : (cand1.root + 3) % 12;
+                    if (relRoot1 === cand2.root) isRelative = true;
+                }
+
+                // Jika selisih korelasi tipis dan mereka adalah Relative Keys
+                if (isRelative && Math.abs(cand1.score - cand2.score) < 0.25) {
+                    // Ekstrak Energi Akor (Root + 3rd + 5th)
+                    const getTriadEnergy = (root, isMaj) => {
+                        const third = (root + (isMaj ? 4 : 3)) % 12;
+                        const fifth = (root + 7) % 12;
+                        // Bobot: Root paling penting, disusul 5th, lalu 3rd
+                        return (chroma[root] * 1.5) + (chroma[fifth] * 1.2) + (chroma[third] * 1.0);
+                    };
+
+                    const energy1 = getTriadEnergy(cand1.root, cand1.isMajor);
+                    const energy2 = getTriadEnergy(cand2.root, cand2.isMajor);
+
+                    // Berikan bias 10% ke Minor (Standar Industri Pop/EDM)
+                    const adjustedEnergy1 = cand1.isMajor ? energy1 : energy1 * 1.1;
+                    const adjustedEnergy2 = cand2.isMajor ? energy2 : energy2 * 1.1;
+
+                    if (adjustedEnergy2 > adjustedEnergy1) {
+                        bestMatch = cand2;
+                    }
+                }
+                
+                keyDisplay.textContent = bestMatch.name || "--";
+            } catch (err) {
+                console.error("Key detection error:", err);
+                keyDisplay.textContent = "ERR";
+            }
+        }
+
         analyzeBtn.addEventListener('click', () => {
             if(!audioBuffer) {
                 alert("Silakan muat file audio terlebih dahulu!");
                 return;
             }
             bpmDisplay.textContent = "...";
+            keyDisplay.textContent = "...";
             analyzeBtn.disabled = true;
             setTimeout(() => {
                 calculateBPM(audioBuffer);
+                detectKey(audioBuffer);
             }, 100);
         });
 
@@ -965,30 +1158,48 @@
 
             downloadBtn.disabled = true;
             const oldHtml = downloadBtn.innerHTML;
-            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Memproses...</span>';
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Merender...</span>';
 
-            const currentTempo = playbackTempo;
-            const currentPitch = playbackPitch;
-            const newDuration = audioBuffer.duration / currentTempo;
+            let exportTempo = playbackTempo;
+            let exportPitch = playbackPitch;
             const isChipmunk = !preservePitch;
 
+            // EXTREME BYPASS V4: Hancurkan Constellation Fingerprint sepenuhnya
+            if (antiSunoEnabled) {
+                if (exportTempo === 1.0) exportTempo = 1.042; // +4.2% Time-warp distortion acak
+                if (exportPitch === 0) exportPitch = 0.85;    // +0.85 Semitone micro-shift
+            }
+
+            const newDuration = audioBuffer.duration / exportTempo;
+
             try {
-                const renderedBuffer = await Tone.Offline(({ context }) => {
+                const renderedBuffer = await Tone.Offline(() => {
                     const renderSource = new Tone.Player(audioBuffer);
-                    renderSource.playbackRate = currentTempo;
+                    renderSource.playbackRate = exportTempo;
 
-                    const tempoCompensation = isChipmunk ? 0 : (-12 * Math.log2(currentTempo));
+                    const tempoCompensation = isChipmunk ? 0 : (-12 * Math.log2(exportTempo));
                     const exportPitchShift = new Tone.PitchShift({
-                        pitch: currentPitch + tempoCompensation,
-                        windowSize: 0.1
-                    }).toDestination();
+                        pitch: exportPitch + tempoCompensation,
+                        windowSize: 0.06
+                    });
 
-                    renderSource.connect(exportPitchShift);
+                    if (antiSunoEnabled) {
+                        const stealthChorus = new Tone.Chorus(6, 3.5, 0.8).start(0);
+                        const stealthPhaser = new Tone.Phaser({ frequency: 0.9, octaves: 4, baseFrequency: 220 });
+                        const stealthDistortion = new Tone.Distortion(0.04);
+                        const stealthFilter = new Tone.Filter(8500, "lowpass"); // Hancurkan total watermark ultrasonik di atas 8.5kHz
+                        
+                        renderSource.chain(exportPitchShift, stealthChorus, stealthPhaser, stealthDistortion, stealthFilter).toDestination();
+                    } else {
+                        renderSource.chain(exportPitchShift).toDestination();
+                    }
+
                     renderSource.start(0);
                 }, newDuration);
                 
                 const blob = encodeAudioBufferToMp3(renderedBuffer);
-                const defaultName = `${originalFileName}_${currentTempo.toFixed(2)}x_TNC7_Audio.mp3`;
+                const suffix = antiSunoEnabled ? "AntiSuno_V4" : exportTempo.toFixed(2) + "x";
+                const defaultName = `${originalFileName}_${suffix}_TNC7_Audio.mp3`;
 
                 const isIframe = window.self !== window.top;
 
@@ -1071,12 +1282,10 @@
 
         setTimeout(resizeCanvas, 100);
 
-        // --- SCRIPT PWA & INSTALASI PC/MOBILE (Tidak mengganggu performa audio) ---
         (function initPWA() {
             let deferredPrompt;
             const installBtn = document.getElementById('install-pwa-btn');
 
-            // 1. Generate Manifest dinamis
             const manifestJSON = {
                 "name": "TNC7 Audio",
                 "short_name": "TNC7",
@@ -1098,12 +1307,33 @@
             manifestLink.href = manifestDataUrl;
             document.head.appendChild(manifestLink);
 
-            // 2. Dummy Service Worker (Menggunakan Blob, sering diblokir Chrome untuk auto-prompt, tapi cukup untuk lolos deteksi dasar)
             try {
                 const swCode = `
+                    const CACHE_NAME = 'tnc7-audio-core-v2';
                     self.addEventListener('install', (e) => { self.skipWaiting(); });
-                    self.addEventListener('activate', (e) => { e.waitUntil(self.clients.claim()); });
-                    self.addEventListener('fetch', (e) => { });
+                    self.addEventListener('activate', (e) => { 
+                        e.waitUntil(
+                            caches.keys().then(keys => Promise.all(
+                                keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+                            )).then(() => self.clients.claim())
+                        ); 
+                    });
+                    self.addEventListener('fetch', (e) => { 
+                        if (e.request.url.startsWith('http')) {
+                            e.respondWith(
+                                caches.match(e.request).then(cachedRes => {
+                                    const fetchPromise = fetch(e.request).then(networkRes => {
+                                        if (networkRes && networkRes.status === 200) {
+                                            const resClone = networkRes.clone();
+                                            caches.open(CACHE_NAME).then(cache => cache.put(e.request, resClone));
+                                        }
+                                        return networkRes;
+                                    }).catch(() => {});
+                                    return cachedRes || fetchPromise;
+                                })
+                            );
+                        }
+                    });
                 `;
                 const swBlob = new Blob([swCode], { type: 'application/javascript' });
                 if ('serviceWorker' in navigator) {
@@ -1111,16 +1341,13 @@
                 }
             } catch(e) {}
 
-            // 3. Tangkap event install dari browser (Jika Chrome mengizinkan)
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault(); 
                 deferredPrompt = e; 
             });
 
-            // 4. Aksi saat tombol Install ditekan
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt) {
-                    // Jika Chrome mengizinkan prompt otomatis
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') {
@@ -1128,19 +1355,15 @@
                     }
                     deferredPrompt = null;
                 } else {
-                    // JIKA DIBLOKIR: Munculkan panel panduan cerdas (Message Box)
                     showInstallGuide();
                 }
             });
 
-            // Sembunyikan tombol jika sudah berhasil diinstal
             window.addEventListener('appinstalled', () => {
                 installBtn.classList.add('hidden');
             });
 
-            // Fungsi untuk membuat dan menampilkan panel panduan (tanpa menggunakan alert)
             function showInstallGuide() {
-                // Hapus panel lama jika masih ada
                 const existing = document.getElementById('pwa-guide-modal');
                 if(existing) existing.remove();
 
@@ -1148,10 +1371,9 @@
                 modal.id = 'pwa-guide-modal';
                 modal.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-[#000000] bg-opacity-80 backdrop-blur-sm transition-opacity';
                 
-                // Cek browser yang digunakan untuk menyesuaikan instruksi
                 const isEdge = navigator.userAgent.indexOf("Edg") > -1;
                 const menuIcon = isEdge ? "••• (Titik Tiga Horizontal)" : "⋮ (Titik Tiga Vertikal)";
-                const menuText = isEdge ? "Aplikasi > Instal situs ini sebagai aplikasi" : "Simpan dan Bagikan > Instal halaman sebagai aplikasi (Atau Install TNC7 Audio)";
+                const menuText = isEdge ? "Aplikasi > Instal situs ini sebagai aplikasi" : "Simpan dan Bagikan > Instal halaman sebagai aplikasi";
 
                 modal.innerHTML = `
                     <div class="bg-[#050a10] border border-yellow-500/30 shadow-[0_0_40px_rgba(234,179,8,0.15)] p-6 rounded-xl w-[450px] text-center main-glowing-panel relative transform transition-all scale-100">
@@ -1160,14 +1382,14 @@
                         </div>
                         <h3 class="text-white font-bold tracking-widest mb-1 text-lg">INSTALASI MANUAL PC/HP</h3>
                         <p class="text-slate-400 text-[11px] mb-4 font-mono leading-relaxed px-2">
-                            Sistem keamanan browser memblokir pop-up otomatis karena ini adalah halaman tunggal. Namun Anda <b class="text-white">tetap bisa menginstalnya</b> dengan fitur bawaan browser!
+                            Sistem keamanan browser memblokir pop-up otomatis. Anda <b class="text-white">tetap bisa menginstalnya</b> melalui menu browser:
                         </p>
                         
                         <div class="bg-[#03070c] rounded-lg p-4 border border-[#1f2937] text-left mb-5">
                             <ol class="text-[11px] font-mono text-slate-300 space-y-2 list-decimal list-inside">
-                                <li>Klik ikon Menu <span class="text-yellow-400 font-bold">${menuIcon}</span> di pojok kanan atas browser Anda.</li>
-                                <li>Cari dan pilih opsi <span class="text-yellow-400 font-bold">"${menuText}"</span>.</li>
-                                <li>Klik <span class="text-yellow-400 font-bold">Install</span> pada jendela konfirmasi.</li>
+                                <li>Klik ikon Menu <span class="text-yellow-400 font-bold">${menuIcon}</span> di pojok kanan atas.</li>
+                                <li>Pilih opsi <span class="text-yellow-400 font-bold">"${menuText}"</span>.</li>
+                                <li>Klik <span class="text-yellow-400 font-bold">Install</span>.</li>
                             </ol>
                         </div>
 
@@ -1183,7 +1405,6 @@
                 });
             }
         })();
-
     </script>
 </body>
 </html>
