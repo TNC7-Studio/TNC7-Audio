@@ -128,8 +128,7 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 relative overflow-hidden min-w-[850px]" oncontextmenu="return false;">
 
-    <!-- Main Card -->
-    <div class="bg-[#050a10] main-glowing-panel p-4 rounded-xl w-[800px] shrink-0 relative z-10 mt-2">
+    <div class="bg-[#050a10] main-glowing-panel p-4 rounded-xl w-[800px] min-w-[800px] max-w-[800px] shrink-0 relative z-10 mt-2">
         
         <!-- Tombol Install PWA -->
         <button id="install-pwa-btn" class="absolute top-4 right-4 z-50 bg-[#0a111a] hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[9px] font-mono tracking-widest uppercase font-bold py-1.5 px-3 rounded-md border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.1)] glowing-panel transition-all flex items-center space-x-1.5 cursor-pointer">
@@ -146,6 +145,24 @@
             <div class="inline-block px-3 py-0.5 mt-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 text-[10px] font-semibold tracking-wider">
                 <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block mr-1.5 animate-pulse"></span>
                 SISTEM SIAP
+            </div>
+        </div>
+
+        <div id="yt-panel" class="bg-[#0a111a] glowing-panel p-3 rounded-lg mb-3 shadow-[0_0_15px_rgba(234,179,8,0.05)] transition-all relative overflow-hidden">
+            <div class="absolute inset-0 bg-yellow-500/5 opacity-50 pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                    <i class="fab fa-youtube text-yellow-500 text-sm"></i>
+                    <span class="text-[10px] font-bold text-yellow-400 font-mono tracking-wider">EKSTRAKSI AUDIO YOUTUBE</span>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="yt-url-input" placeholder="Tempel URL YouTube (https://youtu.be/...)" class="flex-1 bg-[#03070c] border border-yellow-500/30 rounded-md px-3 py-1.5 text-[11px] font-mono text-white focus:outline-none focus:border-yellow-500 transition-colors shadow-inner">
+                    <button id="yt-fetch-btn" class="bg-gradient-to-r from-yellow-700 to-yellow-600 hover:from-yellow-600 hover:to-yellow-500 text-white text-[10px] font-mono tracking-widest uppercase font-bold py-1.5 px-4 rounded-md transition-all flex items-center justify-center space-x-1.5 shadow-[0_0_10px_rgba(234,179,8,0.3)] shrink-0">
+                        <i class="fas fa-bolt"></i>
+                        <span>Ekstrak</span>
+                    </button>
+                </div>
+                <div id="yt-status" class="text-[9px] text-yellow-400 font-mono tracking-widest uppercase hidden text-center mt-1 animate-pulse"></div>
             </div>
         </div>
 
@@ -191,41 +208,61 @@
 
         <div id="player-controls" class="space-y-3">
             <!-- Row 1: Status Bar (Play, BPM, Key, Detect, Export) -->
-            <div class="bg-[#03070c] glowing-panel p-2 rounded-lg flex flex-row items-center justify-between gap-3">
+            <div class="bg-[#03070c] glowing-panel p-2 rounded-lg flex flex-row items-center justify-between">
                 
-                <!-- Play Button -->
-                <div class="flex items-center gap-3 w-auto">
+                <!-- Play Button Group -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <button id="rewind-btn" class="w-[40px] h-[40px] rounded-lg bg-[#181c25] hover:bg-[#1f2937] text-slate-400 hover:text-yellow-400 border border-[#2a3441] hover:border-yellow-500/50 flex items-center justify-center focus:outline-none flex-shrink-0 transition-all shadow-sm group" title="Kembali ke awal">
+                        <i class="fas fa-step-backward text-sm group-active:scale-90 transition-transform"></i>
+                    </button>
                     <button id="play-btn" class="btn-gradient w-[40px] h-[40px] rounded-lg text-white flex items-center justify-center focus:outline-none flex-shrink-0 group relative">
                         <i class="fas fa-play text-lg ml-1" id="play-icon"></i>
                     </button>
                     
                     <!-- BPM Display -->
-                    <div class="flex flex-col border-l border-[#1f2937] pl-3">
-                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold mb-0">BPM Terdeteksi</span>
-                        <div class="flex items-baseline space-x-1">
-                            <span id="bpm-display" class="text-xl font-bold font-mono text-white drop-shadow-sm">--</span>
-                            <span class="text-[9px] text-slate-500 font-mono tracking-widest uppercase">BPM</span>
+                    <div class="flex flex-col border-l border-[#1f2937] pl-3 w-[100px] shrink-0 justify-center h-[40px] ml-1">
+                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold leading-none mb-1">BPM Terdeteksi</span>
+                        <div class="flex items-baseline space-x-1 leading-none mt-0.5">
+                            <span id="bpm-display" class="text-xl font-bold font-mono text-white drop-shadow-sm leading-none">--</span>
+                            <span class="text-[8px] text-slate-500 font-mono tracking-widest uppercase leading-none">BPM</span>
                         </div>
                     </div>
 
                     <!-- Key / Chord Display -->
-                    <div class="flex flex-col border-l border-[#1f2937] pl-3 ml-2">
-                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold mb-0">Nada Dasar</span>
-                        <div class="flex items-baseline space-x-1">
-                            <span id="key-display" class="text-xl font-bold font-mono text-white drop-shadow-sm">--</span>
+                    <div class="flex flex-col border-l border-[#1f2937] pl-3 w-[85px] shrink-0 justify-center h-[40px]">
+                        <span class="text-[9px] text-yellow-500 font-mono tracking-widest uppercase font-bold leading-none mb-1">Nada Dasar</span>
+                        <div class="flex items-baseline space-x-1 leading-none mt-0.5">
+                            <span id="key-display" class="text-xl font-bold font-mono text-white drop-shadow-sm leading-none">--</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Actions -->
-                <div class="flex flex-row gap-2 w-auto">
-                    <button id="analyze-btn" class="w-auto shrink-0 h-8 px-4 rounded-md bg-transparent hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[10px] font-mono tracking-widest uppercase font-bold border border-yellow-900 hover:border-yellow-500 transition-all flex items-center justify-center space-x-1.5">
+                <!-- Actions Group -->
+                <div class="flex flex-row gap-2 items-center shrink-0">
+                    <button id="analyze-btn" class="w-[90px] shrink-0 h-[40px] rounded-md bg-transparent hover:bg-[#111827] text-yellow-500 hover:text-yellow-400 text-[10px] font-mono tracking-widest uppercase font-bold border border-yellow-900 hover:border-yellow-500 transition-all flex items-center justify-center space-x-1.5">
                         <i class="fas fa-sync-alt"></i>
                         <span>Deteksi</span>
                     </button>
-                    <button id="download-btn" class="w-auto shrink-0 h-8 px-4 rounded-md bg-yellow-600 hover:bg-yellow-500 text-white text-[10px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center space-x-1.5 shadow-lg shadow-yellow-900/20">
+                    
+                    <!-- LUFS METER REAL-TIME -->
+                    <div class="flex flex-nowrap w-[145px] shrink-0 items-center justify-center gap-2.5 bg-[#050a10] h-[40px] rounded-md border border-[#1f2937] shadow-inner" title="Loudness Units relative to Full Scale">
+                        <div class="flex flex-col items-center justify-center h-full">
+                            <span class="text-[7px] text-slate-500 font-mono tracking-widest leading-none mb-1 mt-0.5">IN LUFS</span>
+                            <span id="lufs-in-display" class="text-[11px] text-slate-400 font-bold font-mono leading-none">--</span>
+                        </div>
+                        <div class="h-6 w-px bg-[#1f2937]"></div>
+                        <div class="flex flex-col items-center justify-center h-full">
+                            <span class="text-[7px] text-slate-500 font-mono tracking-widest whitespace-nowrap leading-none mb-1 mt-0.5">OUT LUFS <span class="text-[6px] text-green-500">(-14 YT)</span></span>
+                            <span id="lufs-out-display" class="text-[11px] text-yellow-500 font-bold font-mono leading-none">--</span>
+                        </div>
+                    </div>
+
+                    <button id="mastering-btn" class="w-[105px] shrink-0 h-[40px] rounded-md bg-[#181c25] hover:bg-[#1f2937] text-slate-300 hover:text-white text-[10px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center border border-[#2a3441]">
+                        <span id="mastering-text">Master: OFF</span>
+                    </button>
+                    <button id="download-btn" class="w-[95px] shrink-0 h-[40px] rounded-md bg-yellow-600 hover:bg-yellow-500 text-white text-[10px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center space-x-1.5 shadow-lg shadow-yellow-900/20">
                         <i class="fas fa-download"></i>
-                        <span>Ekspor Kilat</span>
+                        <span>Ekspor</span>
                     </button>
                 </div>
             </div>
@@ -245,7 +282,7 @@
                         </div>
                     </div>
                     
-                    <div class="flex flex-wrap gap-1.5 justify-center" id="tempo-buttons-container">
+                    <div class="flex flex-nowrap gap-1.5 justify-center" id="tempo-buttons-container">
                         <button class="tempo-btn active-tempo px-2 py-1 rounded-md text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all" data-val="1.0">1.0x</button>
                         <button class="tempo-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="2.0">2.0x</button>
                         <button class="tempo-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="3.0">3.0x</button>
@@ -268,7 +305,7 @@
                         </div>
                     </div>
                     
-                    <div class="flex flex-wrap gap-1.5 justify-center" id="pitch-buttons-container">
+                    <div class="flex flex-nowrap gap-1.5 justify-center" id="pitch-buttons-container">
                         <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="-12">-12</button>
                         <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="-6">-6</button>
                         <button class="pitch-btn px-2 py-1 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all" data-val="-2">-2</button>
@@ -281,7 +318,7 @@
             </div>
 
             <div class="bg-[#03070c] glowing-panel p-2 rounded-lg flex flex-col justify-center">
-                <div class="flex flex-wrap gap-2 justify-center" id="mode-buttons-container">
+                <div class="flex flex-nowrap gap-2 justify-center w-full" id="mode-buttons-container">
                     <button id="mode-pitch-lock" class="mode-btn active-mode flex-1 py-1.5 rounded-md text-[11px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-1.5">
                         <i class="fas fa-lock"></i>
                         <span>Normal (Kunci Nada)</span>
@@ -291,11 +328,6 @@
                         <span>Efek Tupai</span>
                     </button>
                 </div>
-                <!-- Tombol Anti Blok Suno -->
-                <button id="anti-suno-btn" class="w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5 shadow-sm">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Anti Blok Suno : <span id="anti-suno-status">MATI</span></span>
-                </button>
             </div>
         </div>
     </div>
@@ -316,6 +348,7 @@
         const dropArea = document.getElementById('drop-area');
         const uploadPrompt = document.getElementById('upload-prompt');
         const fileNameDisplay = document.getElementById('file-name-display');
+        const rewindBtn = document.getElementById('rewind-btn');
         const playBtn = document.getElementById('play-btn');
         const playIcon = document.getElementById('play-icon');
         const tempoValueDisplay = document.getElementById('tempo-value');
@@ -326,10 +359,17 @@
         const keyDisplay = document.getElementById('key-display');
         const analyzeBtn = document.getElementById('analyze-btn');
         const downloadBtn = document.getElementById('download-btn');
+        const masteringBtn = document.getElementById('mastering-btn');
+        const masteringText = document.getElementById('mastering-text');
         const canvas = document.getElementById('visualizer');
         const ctx = canvas.getContext('2d');
         const loadingIndicator = document.getElementById('loading-indicator');
         const loadingText = document.getElementById('loading-text');
+
+        const ytPanel = document.getElementById('yt-panel');
+        const ytUrlInput = document.getElementById('yt-url-input');
+        const ytFetchBtn = document.getElementById('yt-fetch-btn');
+        const ytStatus = document.getElementById('yt-status');
 
         const currentTimeEl = document.getElementById('current-time');
         const totalDurationEl = document.getElementById('total-duration');
@@ -355,11 +395,22 @@
         let isDraggingSeek = false;
         let capYPositionArray = [];
         
-        let antiSunoEnabled = false;
-        let antiSunoChorus = null;
-        let antiSunoPhaser = null;
-        let antiSunoDistortion = null;
-        let antiSunoFilter = null;
+        let isMasteringEnabled = false;
+        let masterHighPass = null;
+        let masterLowShelf = null;
+        let masterHighShelf = null;
+        let masterComp1 = null;
+        let masterGain = null;
+        let masterLimiter = null;
+        
+        let lufsAnalyserIn = null;
+        let lufsAnalyserOut = null;
+        let lufsFilterInShelf = null;
+        let lufsFilterInPass = null;
+        let lufsFilterOutShelf = null;
+        let lufsFilterOutPass = null;
+        let lufsInValue = -70;
+        let lufsOutValue = -70;
 
         document.body.addEventListener('click', async () => {
             if (Tone.context.state !== 'running') await Tone.start();
@@ -448,6 +499,174 @@
             }
             reader.readAsArrayBuffer(file);
         }
+
+        function ekstrakVideoID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        async function cariTautanAudio(cleanUrl, statusEl) {
+            const restApis = [
+                `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(cleanUrl)}`,
+                `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(cleanUrl)}`,
+                `https://api.vreden.my.id/api/ytmp3?url=${encodeURIComponent(cleanUrl)}`,
+                `https://api.agatz.xyz/api/ytmp3?url=${encodeURIComponent(cleanUrl)}`
+            ];
+
+            const cariUrlCerdas = (obj) => {
+                let res = { url: null, title: "TNC7_Audio" };
+                if (!obj) return res;
+                try {
+                    const str = JSON.stringify(obj);
+                    const urlMatch = str.match(/"(https:\/\/[^"]*(?:mp3|m4a|googlevideo\.com|download|ytdl)[^"]*)"/i);
+                    if (urlMatch) res.url = urlMatch[1];
+
+                    const titleMatch = str.match(/"(?:title|judul|name)"\s*:\s*"([^"]+)"/i);
+                    if (titleMatch) res.title = titleMatch[1];
+                } catch(e) {}
+                return res;
+            };
+
+            for (let i = 0; i < restApis.length; i++) {
+                statusEl.textContent = `MENEMBUS JALUR API ${i + 1}/${restApis.length}...`;
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+                    const res = await fetch(restApis[i], { signal: controller.signal }).catch(() => null);
+                    clearTimeout(timeoutId);
+                    
+                    if (res && res.ok) {
+                        const data = await res.json().catch(() => null);
+                        if (data) {
+                            const hasil = cariUrlCerdas(data);
+                            if (hasil.url) return { success: true, title: hasil.title || "TNC7_Audio_" + ekstrakVideoID(cleanUrl), url: hasil.url };
+                        }
+                    }
+                } catch (e) {}
+            }
+            return { success: false };
+        }
+
+        ytFetchBtn.addEventListener('click', async () => {
+            const url = ytUrlInput.value.trim();
+            if (!url) {
+                ytStatus.textContent = "URL KOSONG!";
+                ytStatus.classList.remove('hidden');
+                ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1 animate-pulse";
+                setTimeout(() => ytStatus.classList.add('hidden'), 2000);
+                return;
+            }
+            
+            const videoId = ekstrakVideoID(url);
+            if (!videoId) {
+                ytStatus.textContent = "URL YOUTUBE TIDAK VALID!";
+                ytStatus.classList.remove('hidden');
+                ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1 animate-pulse";
+                setTimeout(() => ytStatus.classList.add('hidden'), 3000);
+                return;
+            }
+
+            const cleanUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            const originalBtnText = ytFetchBtn.innerHTML;
+            
+            ytFetchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Proses...</span>';
+            ytFetchBtn.disabled = true;
+            ytStatus.textContent = "MEMULAI MESIN EKSTRAKSI DEWA...";
+            ytStatus.classList.remove('hidden');
+            ytStatus.className = "text-[9px] text-yellow-400 font-bold font-mono tracking-widest uppercase text-center mt-1 animate-pulse";
+
+            try {
+                const audioUrlData = await cariTautanAudio(cleanUrl, ytStatus);
+                
+                if (!audioUrlData.success || !audioUrlData.url) {
+                    ytStatus.textContent = "GAGAL: VIDEO DILINDUNGI HAK CIPTA KETAT.";
+                    ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1";
+                    setTimeout(() => ytStatus.classList.add('hidden'), 5000);
+                    ytFetchBtn.innerHTML = originalBtnText;
+                    ytFetchBtn.disabled = false;
+                    return;
+                }
+                
+                let titleDisplay = audioUrlData.title ? audioUrlData.title.substring(0,25) : 'AUDIO YOUTUBE';
+                ytStatus.textContent = `MENGUNDUH: ${titleDisplay}`;
+                
+                const proxyList = [
+                    (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`, 
+                    (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+                    (u) => `https://thingproxy.freeboard.io/fetch/${u}`,
+                    (u) => u
+                ];
+
+                let arrayBuffer = null;
+                let fetchSuccess = false;
+
+                for (let i = 0; i < proxyList.length; i++) {
+                    try {
+                        ytStatus.textContent = `MENGUNDUH AUDIO (JALUR ${i + 1}/${proxyList.length})... HARAP TUNGGU`;
+                        const targetUrl = proxyList[i](audioUrlData.url);
+                        
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 30000);
+                        
+                        const res = await fetch(targetUrl, { signal: controller.signal }).catch(() => null);
+                        clearTimeout(timeoutId);
+                        
+                        if (res && res.ok) {
+                            const buffer = await res.arrayBuffer().catch(() => null);
+                            if (buffer && buffer.byteLength > 100000) { 
+                                arrayBuffer = buffer;
+                                fetchSuccess = true;
+                                break;
+                            }
+                        }
+                    } catch (err) {}
+                }
+
+                if (!fetchSuccess || !arrayBuffer) {
+                    ytStatus.textContent = "GAGAL: BROWSER MEMBLOKIR UNDUHAN (CORS).";
+                    ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1";
+                    setTimeout(() => ytStatus.classList.add('hidden'), 5000);
+                    ytFetchBtn.innerHTML = originalBtnText;
+                    ytFetchBtn.disabled = false;
+                    return;
+                }
+                
+                originalFileName = audioUrlData.title || "YouTube_Audio";
+                let displayName = originalFileName;
+                if(displayName.length > 30) displayName = displayName.substring(0, 27) + '...';
+                
+                fileNameDisplay.innerHTML = `<i class="fab fa-youtube mr-1 text-yellow-500"></i> ${displayName}`;
+                fileNameDisplay.classList.remove('hidden');
+                uploadPrompt.querySelector('p').classList.add('hidden');
+                
+                stopAudio();
+                cleanupNodes();
+                resetControls();
+                
+                ytStatus.textContent = "BERHASIL DIEKSTRAK & DISIAPKAN!";
+                ytStatus.className = "text-[9px] text-green-400 font-bold font-mono tracking-widest uppercase text-center mt-1";
+                
+                setTimeout(() => { 
+                    ytStatus.classList.add('hidden'); 
+                    ytUrlInput.value = '';
+                }, 3000);
+                
+                loadingIndicator.classList.remove('hidden');
+                canvas.style.opacity = '0';
+                loadingText.textContent = "Mendekode audio YouTube...";
+                
+                initAudio(arrayBuffer);
+
+            } catch (err) {
+                ytStatus.textContent = "SISTEM GAGAL. SILAKAN COBA LAGI.";
+                ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1";
+                setTimeout(() => ytStatus.classList.add('hidden'), 4000);
+            } finally {
+                ytFetchBtn.innerHTML = originalBtnText;
+                ytFetchBtn.disabled = false;
+            }
+        });
 
         async function initAudio(arrayBuffer) {
             try {
@@ -552,23 +771,35 @@
         document.addEventListener('mousemove', handleDragMove);
         document.addEventListener('mouseup', handleDragEnd);
 
-        seekBar.addEventListener('touchstart', handleDragStart, { passive: false });
-        document.addEventListener('touchmove', handleDragMove, { passive: false });
-        document.addEventListener('touchend', handleDragEnd);
-
-        function applyAntiSunoParams() {
-            if (antiSunoChorus && antiSunoPhaser && antiSunoDistortion && antiSunoFilter) {
-                if (antiSunoEnabled) {
-                    antiSunoChorus.wet.value = 0.5;
-                    antiSunoPhaser.wet.value = 0.4;
-                    antiSunoDistortion.wet.value = 0.12;
-                    antiSunoFilter.frequency.value = 9500;
-                } else {
-                    antiSunoChorus.wet.value = 0;
-                    antiSunoPhaser.wet.value = 0;
-                    antiSunoDistortion.wet.value = 0;
-                    antiSunoFilter.frequency.value = 22000;
-                }
+        function updateRouting() {
+            if (!sourceNode) return;
+            
+            sourceNode.disconnect();
+            if (pitchShiftNode) pitchShiftNode.disconnect();
+            if (masterLimiter) masterLimiter.disconnect();
+            
+            let currentNode = sourceNode;
+            
+            if (lufsFilterInShelf) {
+                currentNode.connect(lufsFilterInShelf);
+            }
+            
+            const isPitchShiftNeeded = (playbackTempo !== 1.0 && preservePitch) || playbackPitch !== 0;
+            if (isPitchShiftNeeded && pitchShiftNode) {
+                currentNode.connect(pitchShiftNode);
+                currentNode = pitchShiftNode;
+            }
+            
+            if (isMasteringEnabled && masterHighPass) {
+                currentNode.connect(masterHighPass);
+                currentNode = masterLimiter;
+            }
+            
+            if (analyserNode) {
+                currentNode.connect(analyserNode);
+            }
+            if (lufsFilterOutShelf) {
+                currentNode.connect(lufsFilterOutShelf);
             }
         }
 
@@ -605,31 +836,67 @@
 
             if (!pitchShiftNode) {
                 pitchShiftNode = new Tone.PitchShift({
-                    windowSize: 0.1,
+                    windowSize: 0.08, 
                     pitch: 0
                 });
                 
-                antiSunoChorus = new Tone.Chorus(5, 3, 0.7).start();
-                antiSunoPhaser = new Tone.Phaser({ frequency: 0.7, octaves: 4, baseFrequency: 250 });
-                antiSunoDistortion = new Tone.Distortion(0.08);
-                antiSunoFilter = new Tone.Filter(22000, "lowpass");
+                masterHighPass = new Tone.Filter(20, "highpass");
+                masterLowShelf = new Tone.Filter({ type: "lowshelf", frequency: 80, gain: 2.0 });
+                masterHighShelf = new Tone.Filter({ type: "highshelf", frequency: 12000, gain: 2.5 });
                 
-                antiSunoChorus.wet.value = 0;
-                antiSunoPhaser.wet.value = 0;
-                antiSunoDistortion.wet.value = 0;
+                masterComp1 = new Tone.Compressor({
+                    threshold: -20,
+                    ratio: 3.0,
+                    attack: 0.03,
+                    release: 0.15
+                });
                 
-                pitchShiftNode.chain(antiSunoChorus, antiSunoPhaser, antiSunoDistortion, antiSunoFilter, analyserNode);
+                masterGain = new Tone.Volume(4);
+                masterLimiter = new Tone.Limiter(-0.3);
+                
+                masterHighPass.chain(masterLowShelf, masterHighShelf, masterComp1, masterGain, masterLimiter);
+                
+                lufsAnalyserIn = audioContext.createAnalyser();
+                lufsAnalyserIn.fftSize = 2048;
+                lufsAnalyserOut = audioContext.createAnalyser();
+                lufsAnalyserOut.fftSize = 2048;
+
+                lufsFilterInShelf = audioContext.createBiquadFilter();
+                lufsFilterInShelf.type = "highshelf";
+                lufsFilterInShelf.frequency.value = 1500;
+                lufsFilterInShelf.gain.value = 4.0;
+                
+                lufsFilterInPass = audioContext.createBiquadFilter();
+                lufsFilterInPass.type = "highpass";
+                lufsFilterInPass.frequency.value = 38;
+
+                lufsFilterOutShelf = audioContext.createBiquadFilter();
+                lufsFilterOutShelf.type = "highshelf";
+                lufsFilterOutShelf.frequency.value = 1500;
+                lufsFilterOutShelf.gain.value = 4.0;
+                
+                lufsFilterOutPass = audioContext.createBiquadFilter();
+                lufsFilterOutPass.type = "highpass";
+                lufsFilterOutPass.frequency.value = 38;
+
+                lufsFilterInShelf.connect(lufsFilterInPass);
+                lufsFilterInPass.connect(lufsAnalyserIn);
+                
+                lufsFilterOutShelf.connect(lufsFilterOutPass);
+                lufsFilterOutPass.connect(lufsAnalyserOut);
             }
 
-            sourceNode = new Tone.Player(audioBuffer);
+            sourceNode = new Tone.Player({
+                url: audioBuffer,
+                fadeIn: 0,
+                fadeOut: 0
+            });
             sourceNode.playbackRate = playbackTempo;
             
             const tempoCompensation = preservePitch ? (-12 * Math.log2(playbackTempo)) : 0;
             pitchShiftNode.pitch = playbackPitch + tempoCompensation;
 
-            applyAntiSunoParams();
-            
-            sourceNode.connect(pitchShiftNode);
+            updateRouting(); 
 
             sourceNode.start(0, pausedAt);
             startedAt = audioContext.currentTime; 
@@ -675,10 +942,18 @@
 
         function cleanupNodes() {
             if (pitchShiftNode) { pitchShiftNode.dispose(); pitchShiftNode = null; }
-            if (antiSunoChorus) { antiSunoChorus.dispose(); antiSunoChorus = null; }
-            if (antiSunoPhaser) { antiSunoPhaser.dispose(); antiSunoPhaser = null; }
-            if (antiSunoDistortion) { antiSunoDistortion.dispose(); antiSunoDistortion = null; }
-            if (antiSunoFilter) { antiSunoFilter.dispose(); antiSunoFilter = null; }
+            if (masterHighPass) { masterHighPass.dispose(); masterHighPass = null; }
+            if (masterLowShelf) { masterLowShelf.dispose(); masterLowShelf = null; }
+            if (masterHighShelf) { masterHighShelf.dispose(); masterHighShelf = null; }
+            if (masterComp1) { masterComp1.dispose(); masterComp1 = null; }
+            if (masterGain) { masterGain.dispose(); masterGain = null; }
+            if (masterLimiter) { masterLimiter.dispose(); masterLimiter = null; }
+            if (lufsFilterInShelf) { lufsFilterInShelf.disconnect(); lufsFilterInShelf = null; }
+            if (lufsFilterInPass) { lufsFilterInPass.disconnect(); lufsFilterInPass = null; }
+            if (lufsFilterOutShelf) { lufsFilterOutShelf.disconnect(); lufsFilterOutShelf = null; }
+            if (lufsFilterOutPass) { lufsFilterOutPass.disconnect(); lufsFilterOutPass = null; }
+            if (lufsAnalyserIn) { lufsAnalyserIn.disconnect(); lufsAnalyserIn = null; }
+            if (lufsAnalyserOut) { lufsAnalyserOut.disconnect(); lufsAnalyserOut = null; }
             if (analyserNode) { analyserNode.disconnect(); analyserNode = null; }
         }
 
@@ -711,6 +986,19 @@
             }
         });
 
+        rewindBtn.addEventListener('click', () => {
+            if (!audioBuffer) return;
+            
+            if (isPlaying) {
+                stopAudio();
+                playAudio();
+            } else {
+                pausedAt = 0;
+                currentTimeEl.textContent = "00:00";
+                seekProgress.style.width = "0%";
+            }
+        });
+
         function setTempo(val) {
             if (isPlaying) {
                 const effectiveElapsed = (audioContext.currentTime - startedAt) * playbackTempo;
@@ -733,6 +1021,7 @@
                 sourceNode.playbackRate = val;
                 const tempoCompensation = preservePitch ? (-12 * Math.log2(val)) : 0;
                 pitchShiftNode.pitch = playbackPitch + tempoCompensation;
+                updateRouting();
             }
         }
 
@@ -762,6 +1051,7 @@
             if (sourceNode && pitchShiftNode) {
                 const tempoCompensation = preservePitch ? (-12 * Math.log2(playbackTempo)) : 0;
                 pitchShiftNode.pitch = val + tempoCompensation;
+                updateRouting();
             }
         }
 
@@ -787,6 +1077,7 @@
             if (sourceNode && pitchShiftNode) {
                 const tempoCompensation = -12 * Math.log2(playbackTempo);
                 pitchShiftNode.pitch = playbackPitch + tempoCompensation;
+                updateRouting();
             }
         });
 
@@ -797,24 +1088,21 @@
             
             if (sourceNode && pitchShiftNode) {
                 pitchShiftNode.pitch = playbackPitch;
+                updateRouting();
             }
         });
 
-        const antiSunoBtn = document.getElementById('anti-suno-btn');
-        const antiSunoStatus = document.getElementById('anti-suno-status');
-
-        antiSunoBtn.addEventListener('click', () => {
-            antiSunoEnabled = !antiSunoEnabled;
-            if (antiSunoEnabled) {
-                antiSunoBtn.className = "w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-yellow-900/30 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(234,179,8,0.2)] transition-all flex items-center justify-center space-x-1.5";
-                antiSunoStatus.innerHTML = "AKTIF <span class='text-[9px]'>(On)</span>";
-                antiSunoBtn.querySelector('i').classList.replace('fa-shield-alt', 'fa-shield-virus');
-                applyAntiSunoParams();
+        masteringBtn.addEventListener('click', () => {
+            isMasteringEnabled = !isMasteringEnabled;
+            if (isMasteringEnabled) {
+                masteringBtn.className = "w-[105px] shrink-0 h-[40px] rounded-md bg-yellow-600 hover:bg-yellow-500 text-white text-[10px] font-mono tracking-widest uppercase font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all flex items-center justify-center";
+                masteringText.textContent = "Master: ON";
             } else {
-                antiSunoBtn.className = "w-full mt-2 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5";
-                antiSunoStatus.textContent = "MATI";
-                antiSunoBtn.querySelector('i').classList.replace('fa-shield-virus', 'fa-shield-alt');
-                applyAntiSunoParams();
+                masteringBtn.className = "w-[105px] shrink-0 h-[40px] rounded-md bg-[#181c25] hover:bg-[#1f2937] text-slate-300 hover:text-white text-[10px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center border border-[#2a3441]";
+                masteringText.textContent = "Master: OFF";
+            }
+            if (sourceNode) {
+                updateRouting();
             }
         });
 
@@ -823,6 +1111,10 @@
             setPitch(0);
             bpmDisplay.textContent = '--';
             keyDisplay.textContent = '--';
+            
+            isMasteringEnabled = false;
+            masteringBtn.className = "w-[105px] shrink-0 h-[40px] rounded-md bg-[#181c25] hover:bg-[#1f2937] text-slate-300 hover:text-white text-[10px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center border border-[#2a3441]";
+            masteringText.textContent = "Master: OFF";
         }
 
         function resizeCanvas() {
@@ -848,6 +1140,41 @@
             if (!isPlaying) return;
 
             animationId = requestAnimationFrame(drawVisualizer);
+
+            if (lufsAnalyserIn && lufsAnalyserOut) {
+                const getApproxLUFS = (analyser) => {
+                    const data = new Float32Array(analyser.fftSize);
+                    analyser.getFloatTimeDomainData(data);
+                    let sumSquares = 0;
+                    for (let i = 0; i < data.length; i++) {
+                        sumSquares += data[i] * data[i];
+                    }
+                    let rms = Math.sqrt(sumSquares / data.length);
+                    if (rms < 0.0001) return -70; 
+                    return (20 * Math.log10(rms)) - 0.691; 
+                };
+
+                let rawIn = getApproxLUFS(lufsAnalyserIn);
+                let rawOut = getApproxLUFS(lufsAnalyserOut);
+
+                lufsInValue = (lufsInValue * 0.85) + (rawIn * 0.15);
+                lufsOutValue = (lufsOutValue * 0.85) + (rawOut * 0.15);
+
+                const displayIn = lufsInValue <= -68 ? "--" : lufsInValue.toFixed(1);
+                const displayOut = lufsOutValue <= -68 ? "--" : lufsOutValue.toFixed(1);
+                
+                document.getElementById('lufs-in-display').textContent = displayIn;
+                document.getElementById('lufs-out-display').textContent = displayOut;
+                
+                const outEl = document.getElementById('lufs-out-display');
+                if (lufsOutValue > -13.0) {
+                    outEl.className = "text-[10px] text-red-500 font-bold font-mono";
+                } else if (lufsOutValue >= -15.0 && lufsOutValue <= -13.0) {
+                    outEl.className = "text-[10px] text-green-400 font-bold font-mono";
+                } else {
+                    outEl.className = "text-[10px] text-yellow-500 font-bold font-mono";
+                }
+            }
 
             const bufferLength = analyserNode.frequencyBinCount;
             const dataArray = new Uint8Array(bufferLength);
@@ -1123,7 +1450,6 @@
             }, 100);
         });
 
-        // --- MESIN EKSPOR KILAT SUPER CEPAT & PRESISI REAL-TIME ---
         downloadBtn.addEventListener('click', async () => {
             if (!audioBuffer) {
                 alert("Silakan muat berkas audio terlebih dahulu!");
@@ -1134,8 +1460,7 @@
             let currentPercent = 0;
             downloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>0%</span>`;
 
-            // Cek apakah pengaturan berada di default (tanpa perubahan tempo, pitch, maupun efek)
-            const isDefault = (playbackTempo === 1.0 && playbackPitch === 0 && !antiSunoEnabled);
+            const isDefault = (playbackTempo === 1.0 && playbackPitch === 0 && !isMasteringEnabled);
 
             const startTime = performance.now();
             const estRenderTime = isDefault ? 40 : Math.max(120, (audioBuffer.duration / playbackTempo) * 45);
@@ -1161,7 +1486,6 @@
                 let renderedAudioBuffer;
 
                 if (isDefault) {
-                    // Jalur Cepat (Instant Export) jika tanpa modifikasi sama sekali
                     renderedAudioBuffer = audioBuffer;
                 } else {
                     const originalDuration = audioBuffer.duration;
@@ -1170,6 +1494,7 @@
 
                     const tempoCompensation = preservePitch ? (-12 * Math.log2(playbackTempo)) : 0;
                     const totalPitch = playbackPitch + tempoCompensation;
+                    const isPitchShiftNeededOffline = (playbackTempo !== 1.0 && preservePitch) || playbackPitch !== 0;
 
                     const offlineResult = await Tone.Offline(async (context) => {
                         const offlineAudioBuffer = context.createBuffer(
@@ -1184,29 +1509,35 @@
                         const offlinePlayer = new Tone.Player(offlineAudioBuffer);
                         offlinePlayer.playbackRate = playbackTempo;
 
-                        const pitchShift = new Tone.PitchShift({
-                            windowSize: 0.08,
-                            pitch: totalPitch
-                        });
+                        let currentNode = offlinePlayer;
 
-                        const chorus = new Tone.Chorus(5, 3, 0.7);
-                        const phaser = new Tone.Phaser({ frequency: 0.7, octaves: 4, baseFrequency: 250 });
-                        const distortion = new Tone.Distortion(0.08);
-                        const filter = new Tone.Filter(22000, "lowpass");
-
-                        if (antiSunoEnabled) {
-                            chorus.wet.value = 0.5;
-                            phaser.wet.value = 0.4;
-                            distortion.wet.value = 0.12;
-                            filter.frequency.value = 9500;
-                        } else {
-                            chorus.wet.value = 0;
-                            phaser.wet.value = 0;
-                            distortion.wet.value = 0;
-                            filter.frequency.value = 22000;
+                        if (isPitchShiftNeededOffline) {
+                            const pitchShift = new Tone.PitchShift({
+                                windowSize: 0.08,
+                                pitch: totalPitch
+                            });
+                            currentNode.connect(pitchShift);
+                            currentNode = pitchShift;
                         }
 
-                        offlinePlayer.chain(pitchShift, chorus, phaser, distortion, filter, context.destination);
+                        if (isMasteringEnabled) {
+                            const offHighPass = new Tone.Filter(20, "highpass");
+                            const offLowShelf = new Tone.Filter({ type: "lowshelf", frequency: 80, gain: 2.0 });
+                            const offHighShelf = new Tone.Filter({ type: "highshelf", frequency: 12000, gain: 2.5 });
+                            
+                            const offComp = new Tone.Compressor({
+                                threshold: -20, ratio: 3.0, attack: 0.03, release: 0.15
+                            });
+                            
+                            const offGain = new Tone.Volume(4); 
+                            const offLimiter = new Tone.Limiter(-0.3); 
+                            
+                            offHighPass.chain(offLowShelf, offHighShelf, offComp, offGain, offLimiter, context.destination);
+                            currentNode.connect(offHighPass);
+                        } else {
+                            currentNode.connect(context.destination);
+                        }
+                        
                         offlinePlayer.start(0, 0);
 
                     }, effectiveDuration, audioBuffer.numberOfChannels, targetSampleRate);
@@ -1221,12 +1552,19 @@
                     try {
                         const blob = encodeAudioBufferToMp3(renderedAudioBuffer);
 
-                        let originalBpm = bpmDisplay.textContent.trim();
-                        let originalKey = keyDisplay.textContent.trim();
                         let cleanFileName = originalFileName.replace(/_/g, " ");
-                        const suffix = playbackTempo.toFixed(2) + "x";
+                        let defaultName;
+
+                        if (isMasteringEnabled) {
+                            defaultName = `${cleanFileName} TNC7 Master.mp3`;
+                        } else {
+                            let originalBpm = bpmDisplay.textContent.trim();
+                            let originalKey = keyDisplay.textContent.trim();
+                            const suffix = playbackTempo.toFixed(2) + "x";
+                            defaultName = `${cleanFileName} ${suffix} ${originalBpm} BPM ${originalKey} TNC7 Audio.mp3`;
+                        }
                         
-                        let defaultName = `${cleanFileName} ${suffix} ${originalBpm} BPM ${originalKey} TNC7 Audio.mp3`.replace(/_/g, " ");
+                        defaultName = defaultName.replace(/\s+/g, " ").trim();
 
                         const isIframe = window.self !== window.top;
                         if (window.showSaveFilePicker && !isIframe) {
@@ -1245,13 +1583,13 @@
                             fallbackDownload(blob, defaultName);
                         }
                         downloadBtn.disabled = false;
-                        downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>Ekspor Kilat</span>';
+                        downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>Ekspor</span>';
 
                     } catch (err) {
                         console.error("Kesalahan pengkodean ekspor:", err);
                         alert("Gagal mengonversi audio ke MP3.");
                         downloadBtn.disabled = false;
-                        downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>Ekspor Kilat</span>';
+                        downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>Ekspor</span>';
                     }
                 }, 50);
 
@@ -1259,8 +1597,8 @@
                 clearInterval(progressTimer);
                 console.error("Kesalahan render offline:", err);
                 downloadBtn.disabled = false;
-                downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>Ekspor Kilat</span>';
-                alert("Gagal merender audio kilat. Silakan coba lagi.");
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i><span>Ekspor</span>';
+                alert("Gagal merender audio. Silakan coba lagi.");
             }
         });
 
@@ -1374,7 +1712,7 @@
                         <p class="text-slate-400 text-[11px] mb-4 font-mono leading-relaxed px-2">
                             Keamanan peramban membatasi pop-up otomatis. Anda <b class="text-white">tetap dapat memasangnya</b> melalui menu peramban:
                         </p>
-                        <div class="bg-[#03070c] rounded-lg p-4 border border-[#1f2937] (text-left) mb-5">
+                        <div class="bg-[#03070c] rounded-lg p-4 border border-[#1f2937] text-left mb-5">
                             <ol class="text-[11px] font-mono text-slate-300 space-y-2 list-decimal list-inside">
                                 <li>Klik ikon Menu <span class="text-yellow-400 font-bold">${menuIcon}</span> di sudut kanan atas.</li>
                                 <li>Pilih opsi <span class="text-yellow-400 font-bold">"${menuText}"</span>.</li>
