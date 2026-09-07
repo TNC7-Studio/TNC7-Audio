@@ -1496,11 +1496,48 @@
                 return;
             }
 
+            const isDefault = (playbackTempo === 1.0 && playbackPitch === 0 && !isMasteringEnabled && fadeOutDuration === 0);
+
+            // Tentukan nama file sejak awal
+            let cleanFileName = originalFileName.replace(/_/g, " ");
+            let defaultName;
+
+            if (isMasteringEnabled) {
+                defaultName = `${cleanFileName} TNC7 Master.mp3`;
+                // Mengubah semua huruf menjadi besar, namun menjaga ekstensi tetap .mp3
+                defaultName = defaultName.toUpperCase().replace(/\.MP3$/, '.mp3');
+            } else {
+                let originalBpm = bpmDisplay.textContent.trim();
+                let originalKey = keyDisplay.textContent.trim();
+                const suffix = playbackTempo.toFixed(2) + "x";
+                defaultName = `${cleanFileName} ${suffix} ${originalBpm} BPM ${originalKey} TNC7 Audio.mp3`;
+            }
+            
+            defaultName = defaultName.replace(/\s+/g, " ").trim();
+
+            const isIframe = window.self !== window.top;
+            let fileHandle = null;
+
+            // Minta pengguna memilih folder penyimpanan SEBELUM proses render dimulai
+            if (window.showSaveFilePicker && !isIframe) {
+                try {
+                    fileHandle = await window.showSaveFilePicker({
+                        suggestedName: defaultName,
+                        types: [{ description: 'Berkas Audio MP3', accept: {'audio/mpeg': ['.mp3']} }],
+                    });
+                } catch (err) {
+                    if (err.name === 'AbortError') {
+                        // Pengguna membatalkan pemilihan folder, batalkan seluruh ekspor
+                        return;
+                    }
+                    console.warn("Gagal membuka dialog penyimpanan, beralih ke unduhan otomatis:", err);
+                }
+            }
+
+            // Mulai Proses UI setelah folder dipilih (atau jika fallback digunakan)
             downloadBtn.disabled = true;
             let currentPercent = 0;
             downloadBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>0%</span>`;
-
-            const isDefault = (playbackTempo === 1.0 && playbackPitch === 0 && !isMasteringEnabled && fadeOutDuration === 0);
 
             const startTime = performance.now();
             const estRenderTime = isDefault ? 40 : Math.max(120, (audioBuffer.duration / playbackTempo) * 45);
@@ -1599,7 +1636,39 @@
 
                 setTimeout(async () => {
                     try {
-                        const blob = encodeAudioBufferToMp3(renderedAudioBuffer);
+                        const rawBlob = encodeAudioBufferToMp3(renderedAudioBuffer);
+
+                        // --- MENYEMATKAN COVER ART & METADATA TANPA MENGGANGGU UNDUHAN ---
+                        let blob = rawBlob;
+                        try {
+                            // Gunakan FileReader untuk konversi Blob ke ArrayBuffer yang 100% didukung semua peramban
+                            const arrayBuffer = await new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+                                reader.onload = () => resolve(reader.result);
+                                reader.onerror = reject;
+                                reader.readAsArrayBuffer(rawBlob);
+                            });
+                            
+                            const coverArtBuffer = await generateCoverArtArrayBuffer();
+                            const cleanTitle = originalFileName.replace(/_/g, " ");
+                            
+                            if (typeof browserID3Writer !== 'undefined') {
+                                const writer = new browserID3Writer(arrayBuffer);
+                                writer.setFrame('TIT2', String(cleanTitle))
+                                      .setFrame('TPE1', ['TNC7 Audio'])
+                                      .setFrame('TALB', 'TNC7 Master')
+                                      .setFrame('APIC', {
+                                          type: 3, // 3 = Cover (depan)
+                                          data: coverArtBuffer,
+                                          description: 'Cover'
+                                      });
+                                writer.addTag();
+                                blob = writer.getBlob();
+                            }
+                        } catch (tagErr) {
+                            console.warn("Melewati penyematan cover art agar performa tetap berjalan:", tagErr);
+                        }
+                        // -----------------------------------------------------------------
 
                         let cleanFileName = originalFileName.replace(/_/g, " ");
                         let defaultName;
