@@ -833,15 +833,16 @@
                 masterLowShelf = new Tone.Filter({ type: "lowshelf", frequency: 80, gain: 2.0 });
                 masterHighShelf = new Tone.Filter({ type: "highshelf", frequency: 12000, gain: 2.5 });
                 
+                // Mencegah LUFS melebihi -8 dan melindungi dari audio kencang (Distortion-Free)
                 masterComp1 = new Tone.Compressor({
-                    threshold: -20,
-                    ratio: 3.0,
-                    attack: 0.03,
-                    release: 0.15
+                    threshold: -15,
+                    ratio: 4.0,
+                    attack: 0.01,
+                    release: 0.25
                 });
                 
-                masterGain = new Tone.Volume(4);
-                masterLimiter = new Tone.Limiter(-0.3);
+                masterGain = new Tone.Volume(2.5); // Turun dari 4 ke 2.5 untuk memberikan headroom
+                masterLimiter = new Tone.Limiter(-0.5); // Ceiling di -0.5dB agar peak tertahan halus
                 
                 masterHighPass.chain(masterLowShelf, masterHighShelf, masterComp1, masterGain, masterLimiter);
                 
@@ -1602,12 +1603,13 @@
                             const offLowShelf = new Tone.Filter({ type: "lowshelf", frequency: 80, gain: 2.0 });
                             const offHighShelf = new Tone.Filter({ type: "highshelf", frequency: 12000, gain: 2.5 });
                             
+                            // Mencegah LUFS melebihi -8 saat render offline
                             const offComp = new Tone.Compressor({
-                                threshold: -20, ratio: 3.0, attack: 0.03, release: 0.15
+                                threshold: -15, ratio: 4.0, attack: 0.01, release: 0.25
                             });
                             
-                            const offGain = new Tone.Volume(4); 
-                            const offLimiter = new Tone.Limiter(-0.3); 
+                            const offGain = new Tone.Volume(2.5); // Menyesuaikan dengan konfigurasi player
+                            const offLimiter = new Tone.Limiter(-0.5); 
                             
                             offHighPass.chain(offLowShelf, offHighShelf, offComp, offGain, offLimiter);
                             currentNode.connect(offHighPass);
