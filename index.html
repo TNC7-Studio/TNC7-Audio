@@ -137,28 +137,16 @@
                 <span class="text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]">TNC7</span> 
                 <span class="text-gray-100 drop-shadow-[0_0_15px_rgba(243,244,246,0.2)]">AUDIO</span>
             </h1>
-            <div class="inline-block px-3 py-0.5 mt-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 text-[10px] font-semibold tracking-wider">
+            <div class="inline-block px-3 py-0.5 mt-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-400 text-[10px] font-semibold tracking-wider mb-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block mr-1.5 animate-pulse"></span>
                 SISTEM SIAP
             </div>
-        </div>
-
-        <div id="yt-panel" class="bg-[#0a111a] glowing-panel p-3 rounded-lg mb-3 shadow-[0_0_15px_rgba(234,179,8,0.05)] transition-all relative overflow-hidden">
-            <div class="absolute inset-0 bg-yellow-500/5 opacity-50 pointer-events-none"></div>
-            <div class="relative z-10 flex flex-col gap-2">
-                <div class="flex items-center gap-2">
-                    <i class="fab fa-youtube text-yellow-500 text-sm"></i>
-                    <span class="text-[10px] font-bold text-yellow-400 font-mono tracking-wider">EKSTRAKSI AUDIO YOUTUBE</span>
-                </div>
-                <div class="flex gap-2">
-                    <input type="text" id="yt-url-input" placeholder="Tempel URL YouTube (https://youtu.be/...)" class="flex-1 bg-[#03070c] border border-yellow-500/30 rounded-md px-3 py-1.5 text-[11px] font-mono text-white focus:outline-none focus:border-yellow-500 transition-colors shadow-inner">
-                    <button id="yt-fetch-btn" class="bg-gradient-to-r from-yellow-700 to-yellow-600 hover:from-yellow-600 hover:to-yellow-500 text-white text-[10px] font-mono tracking-widest uppercase font-bold py-1.5 px-4 rounded-md transition-all flex items-center justify-center space-x-1.5 shadow-[0_0_10px_rgba(234,179,8,0.3)] shrink-0">
-                        <i class="fas fa-bolt"></i>
-                        <span>Ekstrak</span>
-                    </button>
-                </div>
-                <div id="yt-status" class="text-[9px] text-yellow-400 font-mono tracking-widest uppercase hidden text-center mt-1 animate-pulse"></div>
-            </div>
+            
+            <a href="https://y2mate.gs/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded bg-[#181c25] hover:bg-[#1f2937] border border-[#2a3441] hover:border-yellow-500/50 text-slate-400 hover:text-yellow-400 transition-all text-[10px] font-mono font-bold tracking-widest uppercase shadow-sm group">
+                <i class="fab fa-youtube text-red-500 group-hover:text-red-400 transition-colors"></i>
+                <span>Unduh Audio YouTube</span>
+                <i class="fas fa-external-link-alt text-[9px] ml-1 opacity-70"></i>
+            </a>
         </div>
 
         <div id="drop-area" class="visualizer-container mb-3 cursor-pointer group flex items-center justify-center relative">
@@ -232,7 +220,7 @@
                         </div>
                         <div class="h-6 w-px bg-[#1f2937]"></div>
                         <div class="flex flex-col items-center justify-center h-full">
-                            <span class="text-[7px] text-slate-500 font-mono tracking-widest whitespace-nowrap leading-none mb-1 mt-0.5">OUT LUFS <span class="text-[6px] text-green-500">(-14 YT)</span></span>
+                            <span class="text-[7px] text-slate-500 font-mono tracking-widest whitespace-nowrap leading-none mb-1 mt-0.5">OUT LUFS <span class="text-[6px] text-green-500">(-12 LUFS)</span></span>
                             <span id="lufs-out-display" class="text-[11px] text-yellow-500 font-bold font-mono leading-none">--</span>
                         </div>
                     </div>
@@ -354,11 +342,6 @@
         const ctx = canvas.getContext('2d');
         const loadingIndicator = document.getElementById('loading-indicator');
         const loadingText = document.getElementById('loading-text');
-
-        const ytPanel = document.getElementById('yt-panel');
-        const ytUrlInput = document.getElementById('yt-url-input');
-        const ytFetchBtn = document.getElementById('yt-fetch-btn');
-        const ytStatus = document.getElementById('yt-status');
 
         const currentTimeEl = document.getElementById('current-time');
         const totalDurationEl = document.getElementById('total-duration');
@@ -487,172 +470,6 @@
             }
             reader.readAsArrayBuffer(file);
         }
-
-        function ekstrakVideoID(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-
-        async function cariTautanAudio(cleanUrl, statusEl) {
-            const restApis = [
-                `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(cleanUrl)}`,
-                `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(cleanUrl)}`,
-                `https://api.vreden.my.id/api/ytmp3?url=${encodeURIComponent(cleanUrl)}`,
-                `https://api.agatz.xyz/api/ytmp3?url=${encodeURIComponent(cleanUrl)}`
-            ];
-
-            const cariUrlCerdas = (obj) => {
-                let res = { url: null, title: "TNC7_Audio" };
-                if (!obj) return res;
-                try {
-                    const str = JSON.stringify(obj);
-                    const urlMatch = str.match(/"(https:\/\/[^"]*(?:mp3|m4a|googlevideo\.com|download|ytdl)[^"]*)"/i);
-                    if (urlMatch) res.url = urlMatch[1];
-
-                    const titleMatch = str.match(/"(?:title|judul|name)"\s*:\s*"([^"]+)"/i);
-                    if (titleMatch) res.title = titleMatch[1];
-                } catch(e) {}
-                return res;
-            };
-
-            for (let i = 0; i < restApis.length; i++) {
-                statusEl.textContent = `MENEMBUS JALUR API ${i + 1}/${restApis.length}...`;
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000);
-                    const res = await fetch(restApis[i], { signal: controller.signal }).catch(() => null);
-                    clearTimeout(timeoutId);
-                    
-                    if (res && res.ok) {
-                        const data = await res.json().catch(() => null);
-                        if (data) {
-                            const hasil = cariUrlCerdas(data);
-                            if (hasil.url) return { success: true, title: hasil.title || "TNC7_Audio_" + ekstrakVideoID(cleanUrl), url: hasil.url };
-                        }
-                    }
-                } catch (e) {}
-            }
-            return { success: false };
-        }
-
-        ytFetchBtn.addEventListener('click', async () => {
-            const url = ytUrlInput.value.trim();
-            if (!url) {
-                ytStatus.textContent = "URL KOSONG!";
-                ytStatus.classList.remove('hidden');
-                ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1 animate-pulse";
-                setTimeout(() => ytStatus.classList.add('hidden'), 2000);
-                return;
-            }
-            
-            const videoId = ekstrakVideoID(url);
-            if (!videoId) {
-                ytStatus.textContent = "URL YOUTUBE TIDAK VALID!";
-                ytStatus.classList.remove('hidden');
-                ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1 animate-pulse";
-                setTimeout(() => ytStatus.classList.add('hidden'), 3000);
-                return;
-            }
-
-            const cleanUrl = `https://www.youtube.com/watch?v=${videoId}`;
-            const originalBtnText = ytFetchBtn.innerHTML;
-            
-            ytFetchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Proses...</span>';
-            ytFetchBtn.disabled = true;
-            ytStatus.textContent = "MEMULAI MESIN EKSTRAKSI DEWA...";
-            ytStatus.classList.remove('hidden');
-            ytStatus.className = "text-[9px] text-yellow-400 font-bold font-mono tracking-widest uppercase text-center mt-1 animate-pulse";
-
-            try {
-                const audioUrlData = await cariTautanAudio(cleanUrl, ytStatus);
-                
-                if (!audioUrlData.success || !audioUrlData.url) {
-                    ytStatus.textContent = "GAGAL: VIDEO DILINDUNGI HAK CIPTA KETAT.";
-                    ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1";
-                    setTimeout(() => ytStatus.classList.add('hidden'), 5000);
-                    ytFetchBtn.innerHTML = originalBtnText;
-                    ytFetchBtn.disabled = false;
-                    return;
-                }
-                
-                let titleDisplay = audioUrlData.title ? audioUrlData.title.substring(0,25) : 'AUDIO YOUTUBE';
-                ytStatus.textContent = `MENGUNDUH: ${titleDisplay}`;
-                
-                const proxyList = [
-                    (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`, 
-                    (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-                    (u) => `https://thingproxy.freeboard.io/fetch/${u}`,
-                    (u) => u
-                ];
-
-                let arrayBuffer = null;
-                let fetchSuccess = false;
-
-                for (let i = 0; i < proxyList.length; i++) {
-                    try {
-                        ytStatus.textContent = `MENGUNDUH AUDIO (JALUR ${i + 1}/${proxyList.length})... HARAP TUNGGU`;
-                        const targetUrl = proxyList[i](audioUrlData.url);
-                        
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 30000);
-                        
-                        const res = await fetch(targetUrl, { signal: controller.signal }).catch(() => null);
-                        clearTimeout(timeoutId);
-                        
-                        if (res && res.ok) {
-                            const buffer = await res.arrayBuffer().catch(() => null);
-                            if (buffer && buffer.byteLength > 100000) { 
-                                arrayBuffer = buffer;
-                                fetchSuccess = true;
-                                break;
-                            }
-                        }
-                    } catch (err) {}
-                }
-
-                if (!fetchSuccess || !arrayBuffer) {
-                    ytStatus.textContent = "GAGAL: BROWSER MEMBLOKIR UNDUHAN (CORS).";
-                    ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1";
-                    setTimeout(() => ytStatus.classList.add('hidden'), 5000);
-                    ytFetchBtn.innerHTML = originalBtnText;
-                    ytFetchBtn.disabled = false;
-                    return;
-                }
-                
-                originalFileName = audioUrlData.title || "YouTube_Audio";
-                let displayName = originalFileName;
-                if(displayName.length > 55) displayName = displayName.substring(0, 52) + '...';
-                
-                trackStatusEl.innerHTML = `<i class="fab fa-youtube mr-1 text-yellow-500"></i> <span class="text-white">${displayName}</span>`;
-                
-                stopAudio();
-                cleanupNodes();
-                resetControls();
-                
-                ytStatus.textContent = "BERHASIL DIEKSTRAK & DISIAPKAN!";
-                ytStatus.className = "text-[9px] text-green-400 font-bold font-mono tracking-widest uppercase text-center mt-1";
-                
-                setTimeout(() => { 
-                    ytStatus.classList.add('hidden'); 
-                    ytUrlInput.value = '';
-                }, 3000);
-                
-                loadingIndicator.classList.remove('hidden');
-                canvas.style.opacity = '0';
-                loadingText.textContent = "Mendekode audio YouTube...";
-                
-                initAudio(arrayBuffer);
-
-            } catch (err) {
-                ytStatus.textContent = "SISTEM GAGAL. SILAKAN COBA LAGI.";
-                ytStatus.className = "text-[9px] text-red-500 font-bold font-mono tracking-widest uppercase text-center mt-1";
-                setTimeout(() => ytStatus.classList.add('hidden'), 4000);
-            } finally {
-                ytFetchBtn.innerHTML = originalBtnText;
-                ytFetchBtn.disabled = false;
-            }
-        });
 
         async function initAudio(arrayBuffer) {
             try {
@@ -833,16 +650,16 @@
                 masterLowShelf = new Tone.Filter({ type: "lowshelf", frequency: 80, gain: 2.0 });
                 masterHighShelf = new Tone.Filter({ type: "highshelf", frequency: 12000, gain: 2.5 });
                 
-                // Mencegah LUFS melebihi -8 dan melindungi dari audio kencang (Distortion-Free)
+                // Mencegah LUFS melebihi batas dan melindungi dari audio kencang (Distortion-Free)
                 masterComp1 = new Tone.Compressor({
-                    threshold: -15,
+                    threshold: -12,
                     ratio: 4.0,
                     attack: 0.01,
                     release: 0.25
                 });
                 
-                masterGain = new Tone.Volume(2.5); // Turun dari 4 ke 2.5 untuk memberikan headroom
-                masterLimiter = new Tone.Limiter(-0.5); // Ceiling di -0.5dB agar peak tertahan halus
+                masterGain = new Tone.Volume(4.0); // Naik ke 4.0 untuk target -12 LUFS
+                masterLimiter = new Tone.Limiter(-0.1); // Ceiling di -0.1dB agar peak tertahan halus
                 
                 masterHighPass.chain(masterLowShelf, masterHighShelf, masterComp1, masterGain, masterLimiter);
                 
@@ -1208,9 +1025,9 @@
                 document.getElementById('lufs-out-display').textContent = displayOut;
                 
                 const outEl = document.getElementById('lufs-out-display');
-                if (lufsOutValue > -13.0) {
+                if (lufsOutValue > -11.0) {
                     outEl.className = "text-[10px] text-red-500 font-bold font-mono";
-                } else if (lufsOutValue >= -15.0 && lufsOutValue <= -13.0) {
+                } else if (lufsOutValue >= -13.0 && lufsOutValue <= -11.0) {
                     outEl.className = "text-[10px] text-green-400 font-bold font-mono";
                 } else {
                     outEl.className = "text-[10px] text-yellow-500 font-bold font-mono";
@@ -1603,13 +1420,13 @@
                             const offLowShelf = new Tone.Filter({ type: "lowshelf", frequency: 80, gain: 2.0 });
                             const offHighShelf = new Tone.Filter({ type: "highshelf", frequency: 12000, gain: 2.5 });
                             
-                            // Mencegah LUFS melebihi -8 saat render offline
+                            // Mencegah LUFS melebihi batas saat render offline
                             const offComp = new Tone.Compressor({
-                                threshold: -15, ratio: 4.0, attack: 0.01, release: 0.25
+                                threshold: -12, ratio: 4.0, attack: 0.01, release: 0.25
                             });
                             
-                            const offGain = new Tone.Volume(2.5); // Menyesuaikan dengan konfigurasi player
-                            const offLimiter = new Tone.Limiter(-0.5); 
+                            const offGain = new Tone.Volume(4.0); // Menyesuaikan target -12 LUFS
+                            const offLimiter = new Tone.Limiter(-0.1); 
                             
                             offHighPass.chain(offLowShelf, offHighShelf, offComp, offGain, offLimiter);
                             currentNode.connect(offHighPass);
