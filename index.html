@@ -1329,21 +1329,30 @@
             const ext = format === 'mp3' ? '.mp3' : '.wav';
             const mimeType = format === 'mp3' ? 'audio/mpeg' : 'audio/wav';
 
-            // Standar Agregator TuneCore untuk WAV: 44.1 kHz (44100 Hz), Stereo (2 Channel), 16-bit
+            // Standar Agregator TuneCore untuk WAV: 192 kHz (192000 Hz), Stereo (2 Channel), 24-bit
             const isWav = format === 'wav';
-            const targetSampleRate = isWav ? 44100 : audioBuffer.sampleRate;
+            const targetSampleRate = isWav ? 192000 : audioBuffer.sampleRate;
             const targetChannels = isWav ? 2 : audioBuffer.numberOfChannels;
 
             const isDefault = (playbackTempo === 1.0 && playbackPitch === 0 && !isMasteringEnabled && fadeOutDuration === 0 && audioBuffer.sampleRate === targetSampleRate && audioBuffer.numberOfChannels === targetChannels);
 
+            function toTitleCase(str) {
+                return str.replace(/\w\S*/g, function(txt) {
+                    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+                });
+            }
+
             // Tentukan nama file sejak awal
-            let cleanFileName = originalFileName.replace(/_/g, " ");
+            let cleanFileName = toTitleCase(originalFileName.replace(/_/g, " "));
             let defaultName;
 
             if (isMasteringEnabled) {
                 defaultName = `${cleanFileName} TNC7 Master${ext}`;
-                // Mengubah semua huruf menjadi besar, namun menjaga ekstensi
-                defaultName = defaultName.toUpperCase().replace(new RegExp(`\\${ext.toUpperCase()}$`), ext);
+            } else if (isWav) {
+                let originalBpm = bpmDisplay.textContent.trim();
+                let originalKey = keyDisplay.textContent.trim();
+                const suffix = playbackTempo.toFixed(2) + "x";
+                defaultName = `${cleanFileName} ${suffix} ${originalBpm} BPM ${originalKey} Master${ext}`;
             } else {
                 let originalBpm = bpmDisplay.textContent.trim();
                 let originalKey = keyDisplay.textContent.trim();
@@ -1509,12 +1518,16 @@
                         }
                         // -----------------------------------------------------------------
 
-                        let cleanFileName = originalFileName.replace(/_/g, " ");
+                        let cleanFileName = toTitleCase(originalFileName.replace(/_/g, " "));
                         let defaultName;
 
                         if (isMasteringEnabled) {
                             defaultName = `${cleanFileName} TNC7 Master${ext}`;
-                            defaultName = defaultName.toUpperCase().replace(new RegExp(`\\${ext.toUpperCase()}$`), ext);
+                        } else if (isWav) {
+                            let originalBpm = bpmDisplay.textContent.trim();
+                            let originalKey = keyDisplay.textContent.trim();
+                            const suffix = playbackTempo.toFixed(2) + "x";
+                            defaultName = `${cleanFileName} ${suffix} ${originalBpm} BPM ${originalKey} Master${ext}`;
                         } else {
                             let originalBpm = bpmDisplay.textContent.trim();
                             let originalKey = keyDisplay.textContent.trim();
@@ -1607,7 +1620,7 @@
 
         function encodeAudioBufferToWav(buffer) {
             const numOfChan = buffer.numberOfChannels;
-            const length = buffer.length * numOfChan * 2 + 44;
+            const length = buffer.length * numOfChan * 3 + 44; // 24-bit membutuhkan 3 bytes per sample
             const bufferWav = new ArrayBuffer(length);
             const view = new DataView(bufferWav);
             const channels = [];
@@ -1634,12 +1647,12 @@
             setUint16(1); // PCM (uncompressed)
             setUint16(numOfChan);
             setUint32(sampleRate);
-            setUint32(sampleRate * 2 * numOfChan); // avg. bytes/sec
-            setUint16(numOfChan * 2); // block-align
-            setUint16(16); // 16-bit
+            setUint32(sampleRate * 3 * numOfChan); // avg. bytes/sec
+            setUint16(numOfChan * 3); // block-align
+            setUint16(24); // 24-bit
             
             setUint32(0x61746164); // "data" - chunk
-            setUint32(length - pos - 4); // chunk length
+            setUint32(length - 44); // chunk length
             
             for (let i = 0; i < buffer.numberOfChannels; i++) {
                 channels.push(buffer.getChannelData(i));
@@ -1648,9 +1661,14 @@
             while(pos < buffer.length) {
                 for(let i = 0; i < numOfChan; i++) {
                     let sample = Math.max(-1, Math.min(1, channels[i][pos]));
-                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0; 
-                    view.setInt16(offset, sample, true); 
-                    offset += 2;
+                    let intSample = sample < 0 ? sample * 8388608 : sample * 8388607;
+                    intSample = Math.round(intSample); 
+                    
+                    // 24-bit little-endian data writing
+                    view.setUint8(offset, intSample & 0xFF);
+                    view.setUint8(offset + 1, (intSample >> 8) & 0xFF);
+                    view.setUint8(offset + 2, (intSample >> 16) & 0xFF);
+                    offset += 3;
                 }
                 pos++;
             }
