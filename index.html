@@ -1325,10 +1325,16 @@
                 return;
             }
 
-            const isDefault = (playbackTempo === 1.0 && playbackPitch === 0 && !isMasteringEnabled && fadeOutDuration === 0);
             const format = exportFormat.value;
             const ext = format === 'mp3' ? '.mp3' : '.wav';
             const mimeType = format === 'mp3' ? 'audio/mpeg' : 'audio/wav';
+
+            // Standar Agregator TuneCore untuk WAV: 44.1 kHz (44100 Hz), Stereo (2 Channel), 16-bit
+            const isWav = format === 'wav';
+            const targetSampleRate = isWav ? 44100 : audioBuffer.sampleRate;
+            const targetChannels = isWav ? 2 : audioBuffer.numberOfChannels;
+
+            const isDefault = (playbackTempo === 1.0 && playbackPitch === 0 && !isMasteringEnabled && fadeOutDuration === 0 && audioBuffer.sampleRate === targetSampleRate && audioBuffer.numberOfChannels === targetChannels);
 
             // Tentukan nama file sejak awal
             let cleanFileName = originalFileName.replace(/_/g, " ");
@@ -1399,7 +1405,6 @@
                 } else {
                     const originalDuration = audioBuffer.duration;
                     const effectiveDuration = originalDuration / playbackTempo;
-                    const targetSampleRate = audioBuffer.sampleRate;
 
                     const tempoCompensation = preservePitch ? (-12 * Math.log2(playbackTempo)) : 0;
                     const totalPitch = playbackPitch + tempoCompensation;
@@ -1459,7 +1464,7 @@
                         
                         offlinePlayer.start(0, 0);
 
-                    }, effectiveDuration, audioBuffer.numberOfChannels, targetSampleRate);
+                    }, effectiveDuration, targetChannels, targetSampleRate);
 
                     renderedAudioBuffer = offlineResult.get();
                 }
@@ -1566,7 +1571,7 @@
         function encodeAudioBufferToMp3(buffer) {
             const channels = buffer.numberOfChannels;
             const sampleRate = buffer.sampleRate;
-            const kbps = 192;
+            const kbps = 128;
             const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, kbps);
             const mp3Data = [];
 
