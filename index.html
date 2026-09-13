@@ -182,28 +182,28 @@
         </div>
 
         <div id="player-controls" class="space-y-3">
-            <div class="bg-[#03070c] glowing-panel p-2 rounded-lg flex flex-nowrap items-center justify-between w-full h-[56px]">
+            <div class="bg-[#03070c] glowing-panel p-2 rounded-lg flex flex-nowrap items-center justify-between w-full h-[56px] overflow-hidden">
                 
                 <div class="flex flex-nowrap items-center gap-1.5 shrink-0">
-                    <button id="rewind-btn" class="w-[36px] h-[36px] rounded-lg bg-[#181c25] hover:bg-[#1f2937] text-slate-400 hover:text-yellow-400 border border-[#2a3441] hover:border-yellow-500/50 flex items-center justify-center focus:outline-none flex-shrink-0 transition-all shadow-sm group" title="Kembali ke awal">
+                    <button id="rewind-btn" class="w-[36px] h-[36px] rounded-lg bg-[#181c25] hover:bg-[#1f2937] text-slate-400 hover:text-yellow-400 border border-[#2a3441] hover:border-yellow-500/50 flex items-center justify-center focus:outline-none shrink-0 transition-all shadow-sm group" title="Kembali ke awal">
                         <i class="fas fa-step-backward text-sm group-active:scale-90 transition-transform"></i>
                     </button>
-                    <button id="play-btn" class="btn-gradient w-[36px] h-[36px] rounded-lg text-white flex items-center justify-center focus:outline-none flex-shrink-0 group relative">
+                    <button id="play-btn" class="btn-gradient w-[36px] h-[36px] rounded-lg text-white flex items-center justify-center focus:outline-none shrink-0 group relative">
                         <i class="fas fa-play text-lg ml-1" id="play-icon"></i>
                     </button>
                     
-                    <div class="flex flex-col border-l border-[#1f2937] pl-2 w-[85px] shrink-0 justify-center h-[36px] ml-1">
-                        <span class="text-[8px] text-yellow-500 font-mono tracking-widest uppercase font-bold leading-none mb-1">BPM TERDETEKSI</span>
+                    <div class="flex flex-col border-l border-[#1f2937] pl-2 w-[90px] shrink-0 justify-center h-[36px] ml-1 overflow-hidden">
+                        <span class="text-[8px] text-yellow-500 font-mono tracking-widest uppercase font-bold leading-none mb-1 whitespace-nowrap">BPM TERDETEKSI</span>
                         <div class="flex items-baseline space-x-1 leading-none mt-0.5">
-                            <span id="bpm-display" class="text-lg font-bold font-mono text-white drop-shadow-sm leading-none">--</span>
+                            <span id="bpm-display" class="text-lg font-bold font-mono text-white drop-shadow-sm leading-none w-[34px] inline-block text-left">--</span>
                             <span class="text-[7px] text-slate-500 font-mono tracking-widest uppercase leading-none">BPM</span>
                         </div>
                     </div>
 
-                    <div class="flex flex-col border-l border-[#1f2937] pl-2 w-[75px] shrink-0 justify-center h-[36px]">
-                        <span class="text-[8px] text-yellow-500 font-mono tracking-widest uppercase font-bold leading-none mb-1">NADA DASAR</span>
+                    <div class="flex flex-col border-l border-[#1f2937] pl-2 w-[95px] shrink-0 justify-center h-[36px] overflow-hidden">
+                        <span class="text-[8px] text-yellow-500 font-mono tracking-widest uppercase font-bold leading-none mb-1 whitespace-nowrap">NADA DASAR</span>
                         <div class="flex items-baseline space-x-1 leading-none mt-0.5">
-                            <span id="key-display" class="text-lg font-bold font-mono text-white drop-shadow-sm leading-none">--</span>
+                            <span id="key-display" class="text-lg font-bold font-mono text-white drop-shadow-sm leading-none w-full inline-block text-left truncate">--</span>
                         </div>
                     </div>
                 </div>
@@ -213,28 +213,28 @@
                         <i class="fas fa-sync-alt text-sm"></i>
                     </button>
                     
-                    <div class="flex flex-nowrap w-[125px] shrink-0 items-center justify-center gap-2 bg-[#050a10] h-[36px] rounded-md border border-[#1f2937] shadow-inner" title="Loudness Units relative to Full Scale">
-                        <div class="flex flex-col items-center justify-center h-full">
+                    <div class="flex flex-nowrap w-[130px] shrink-0 items-center justify-center gap-2 bg-[#050a10] h-[36px] rounded-md border border-[#1f2937] shadow-inner overflow-hidden" title="Loudness Units relative to Full Scale">
+                        <div class="flex flex-col items-center justify-center h-full w-[45px] shrink-0">
                             <span class="text-[6px] text-slate-500 font-mono tracking-widest leading-none mb-1 mt-0.5">IN LUFS</span>
-                            <span id="lufs-in-display" class="text-[10px] text-slate-400 font-bold font-mono leading-none">--</span>
+                            <span id="lufs-in-display" class="text-[10px] text-slate-400 font-bold font-mono leading-none w-full text-center inline-block truncate">--</span>
                         </div>
-                        <div class="h-5 w-px bg-[#1f2937]"></div>
-                        <div class="flex flex-col items-center justify-center h-full">
+                        <div class="h-5 w-px bg-[#1f2937] shrink-0"></div>
+                        <div class="flex flex-col items-center justify-center h-full w-[60px] shrink-0">
                             <span class="text-[6px] text-slate-500 font-mono tracking-widest whitespace-nowrap leading-none mb-1 mt-0.5">OUT LUFS <span class="text-[5px] text-green-500">(-12)</span></span>
-                            <span id="lufs-out-display" class="text-[10px] text-yellow-500 font-bold font-mono leading-none">--</span>
+                            <span id="lufs-out-display" class="text-[10px] text-yellow-500 font-bold font-mono leading-none w-full text-center inline-block truncate">--</span>
                         </div>
                     </div>
 
-                    <button id="mastering-btn" class="w-[90px] shrink-0 h-[36px] rounded-md bg-[#181c25] hover:bg-[#1f2937] text-slate-300 hover:text-white text-[9px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center border border-[#2a3441]">
-                        <span id="mastering-text">MASTER: OFF</span>
+                    <button id="mastering-btn" class="w-[90px] shrink-0 h-[36px] rounded-md bg-[#181c25] hover:bg-[#1f2937] text-slate-300 hover:text-white text-[9px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center border border-[#2a3441] overflow-hidden">
+                        <span id="mastering-text" class="truncate">MASTER: OFF</span>
                     </button>
-                    <select id="export-format" class="bg-[#181c25] border border-[#2a3441] text-yellow-500 hover:text-yellow-400 text-[9px] font-mono tracking-widest uppercase font-bold h-[36px] px-1 rounded-md transition-all focus:outline-none focus:border-yellow-500 cursor-pointer shadow-sm outline-none">
+                    <select id="export-format" class="w-[65px] shrink-0 bg-[#181c25] border border-[#2a3441] text-yellow-500 hover:text-yellow-400 text-[9px] font-mono tracking-widest uppercase font-bold h-[36px] px-1 rounded-md transition-all focus:outline-none focus:border-yellow-500 cursor-pointer shadow-sm outline-none">
                         <option value="mp3">MP3</option>
                         <option value="wav">WAV</option>
                     </select>
-                    <button id="download-btn" class="w-[85px] shrink-0 h-[36px] rounded-md bg-yellow-600 hover:bg-yellow-500 text-white text-[9px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center space-x-1 shadow-lg shadow-yellow-900/20">
-                        <i class="fas fa-download text-sm"></i>
-                        <span>EKSPOR</span>
+                    <button id="download-btn" class="w-[85px] shrink-0 h-[36px] rounded-md bg-yellow-600 hover:bg-yellow-500 text-white text-[9px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center space-x-1 shadow-lg shadow-yellow-900/20 overflow-hidden">
+                        <i class="fas fa-download text-sm shrink-0"></i>
+                        <span class="truncate">EKSPOR</span>
                     </button>
                 </div>
             </div>
@@ -887,8 +887,8 @@
 
         modePitchLock.addEventListener('click', () => {
             preservePitch = true;
-            modePitchLock.className = "mode-btn active-mode flex-1 py-1.5 rounded-md text-[11px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-1.5";
-            modeChipmunk.className = "mode-btn flex-1 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5";
+            modePitchLock.className = "mode-btn active-mode flex-1 py-1.5 rounded-md text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-1.5";
+            modeChipmunk.className = "mode-btn flex-1 py-1.5 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5";
             
             if (sourceNode && pitchShiftNode) {
                 const tempoCompensation = -12 * Math.log2(playbackTempo);
@@ -899,8 +899,8 @@
 
         modeChipmunk.addEventListener('click', () => {
             preservePitch = false;
-            modeChipmunk.className = "mode-btn active-mode flex-1 py-1.5 rounded-md text-[11px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-1.5";
-            modePitchLock.className = "mode-btn flex-1 py-1.5 rounded-md text-[11px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5";
+            modeChipmunk.className = "mode-btn active-mode flex-1 py-1.5 rounded-md text-[10px] font-bold bg-yellow-500/20 border border-yellow-500 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)] transition-all flex items-center justify-center space-x-1.5";
+            modePitchLock.className = "mode-btn flex-1 py-1.5 rounded-md text-[10px] font-bold bg-[#181c25] border border-[#2a3441] text-slate-400 hover:text-yellow-400 hover:border-yellow-500/50 transition-all flex items-center justify-center space-x-1.5";
             
             if (sourceNode && pitchShiftNode) {
                 pitchShiftNode.pitch = playbackPitch;
@@ -952,10 +952,10 @@
         masteringBtn.addEventListener('click', () => {
             isMasteringEnabled = !isMasteringEnabled;
             if (isMasteringEnabled) {
-                masteringBtn.className = "w-[105px] shrink-0 h-[40px] rounded-md bg-yellow-600 hover:bg-yellow-500 text-white text-[10px] font-mono tracking-widest uppercase font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all flex items-center justify-center";
+                masteringBtn.className = "w-[90px] shrink-0 h-[36px] rounded-md bg-yellow-600 hover:bg-yellow-500 text-white text-[9px] font-mono tracking-widest uppercase font-bold shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-all flex items-center justify-center overflow-hidden";
                 masteringText.textContent = "MASTER: ON";
             } else {
-                masteringBtn.className = "w-[105px] shrink-0 h-[40px] rounded-md bg-[#181c25] hover:bg-[#1f2937] text-slate-300 hover:text-white text-[10px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center border border-[#2a3441]";
+                masteringBtn.className = "w-[90px] shrink-0 h-[36px] rounded-md bg-[#181c25] hover:bg-[#1f2937] text-slate-300 hover:text-white text-[9px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center border border-[#2a3441] overflow-hidden";
                 masteringText.textContent = "MASTER: OFF";
             }
             if (sourceNode) {
@@ -970,7 +970,7 @@
             keyDisplay.textContent = '--';
             
             isMasteringEnabled = false;
-            masteringBtn.className = "w-[105px] shrink-0 h-[40px] rounded-md bg-[#181c25] hover:bg-[#1f2937] text-slate-300 hover:text-white text-[10px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center border border-[#2a3441]";
+            masteringBtn.className = "w-[90px] shrink-0 h-[36px] rounded-md bg-[#181c25] hover:bg-[#1f2937] text-slate-300 hover:text-white text-[9px] font-mono tracking-widest uppercase font-bold transition-all flex items-center justify-center border border-[#2a3441] overflow-hidden";
             masteringText.textContent = "MASTER: OFF";
             
             fadeOutDuration = 0;
